@@ -9,6 +9,7 @@ var db = require('./src/database');
 let usersRoute = require('./src/routes/users')
 let hazardRoue = require('./src/routes/hazards')
 let accidentRoute = require('./src/routes/accident')
+let cityRoute  = require('./src/routes/city')
 
 
 app.use(bodyParser.json())
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, 'build')))
 app.use('/api/v1/users',usersRoute)
 app.use('/api/v1/hazards',hazardRoue)
 app.use('/api/v1/accident',accidentRoute)
+app.use('/api/v1/city', cityRoute)
 //if not find - navigate in react
 app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'))
