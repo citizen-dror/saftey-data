@@ -1,5 +1,5 @@
 let express = require("express")
-let AccidentMoedel = require("../models/accident.ped.model")
+let AccidentMoedel = require("../models/accidents.model")
 let router = express.Router()
 
 //http://localhost:5000/api/v1/accident
