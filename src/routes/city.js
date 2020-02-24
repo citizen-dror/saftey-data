@@ -5,7 +5,11 @@ let router = express.Router()
 //http://localhost:5000/api/v1/city
 //http://localhost:5000/api/v1/city?name_he=חיפה
 //http://localhost:5000/api/v1/city?name_en=Rehovot
+//http://localhost:5000/api/v1/city?lang=he
 router.get('/', (req, res) => {
+    if (req.query.lang) {
+        findFilterBylang(req, res)
+    }
     if (req.query.name_he) {
         findByNameHe(req, res)
     }
@@ -18,8 +22,24 @@ router.get('/', (req, res) => {
     
 })
 
+findFilterBylang = (req, res) => {
+    let proj ={};
+    if(req.query.lang == "he")
+         proj= {name_he: 1}
+    else if(req.query.lang == "ar")
+         proj= {name_ar: 1}
+    else
+         proj= {name_en: 1}    
+    CityModel.find({}, proj)
+        .then(doc => {
+            return res.jsonp(doc)
+        })
+        .catch(err => {
+            return res.status(500).jsonp(err)
+        })
+}
+
 findByNameHe = (req, res) => {
-    console.log("name_he")
     CityModel.find({ name_he: req.query.name_he }, {})
         .then(doc => {
             return res.jsonp(doc)
@@ -29,8 +49,6 @@ findByNameHe = (req, res) => {
         })
 }
 findByNameEn = (req, res) => {
-    console.log("name_en")
-    console.log(req.query.name_en)
     CityModel.find({ name_en: req.query.name_en }, {})
         .then(doc => {
             return res.jsonp(doc)
