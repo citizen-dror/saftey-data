@@ -32,6 +32,8 @@ findFilterBylang = (req, res) => {
          proj= {name_en: 1}    
     CityModel.find({}, proj)
         .then(doc => {
+            // let arr = doc.map(x =>  {return ("\"" + x.name_he + "\"" )})
+            // saveAsfile(arr)
             return res.jsonp(doc)
         })
         .catch(err => {
@@ -82,6 +84,15 @@ router.post('/', (req, res) => {
             return res.status(500).jsonp(err)
         })
 })
+//helper function to save json to json file
+saveAsfile = (jsonData) =>{
+    var fs = require('fs');
+    fs.writeFile("test.txt", jsonData, function(err) {
+        if (err) {
+            console.log(err);
+        }
+    });
+}
 
 
 // http://localhost:3000/person/mike
