@@ -39,6 +39,20 @@ router.post('/',(req,res) =>{
     //     return res.status(500).json(err)
     // })
 })
+//filter+ group by by post
+router.post('/agg',(req,res) =>{
+    if (!req.body)
+    {
+        return res.status(400).send("request boddy is missing!")
+    }
+    AccidentMoedel.aggregate(req.body)
+    .then(doc => {
+        return res.jsonp(doc)
+    })
+    .catch(err => {
+        return res.status(500).jsonp(err)
+    })
+})
 
 findByYear = (req, res) => {
     AccidentMoedel.find({ accident_year: req.query.year }, {})
@@ -53,8 +67,7 @@ findByYear = (req, res) => {
 groupByYear = (req, res) => {
     AccidentMoedel.aggregate([
         {"$group" : {_id:"$accident_year", count:{$sum:1}}}
-   /*      {"$group" : {_id:{year:"$accident_year"}, count:{$sum:1}}},
-        {$sort:{"_id.year":1}} */
+        ,{"$sort": { _id: 1}}
     ])
         .then(doc => {
             return res.jsonp(doc)
