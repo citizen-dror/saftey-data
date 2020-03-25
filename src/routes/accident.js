@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
     findByFilter(req, res, {})
 })
 router.post('/latlon', (req, res) => {
-    findByFilter(req, res, { latitude: 1, longitude: 1 })
+    findByFilter(req, res, { latitude: 1, longitude: 1 , injury_severity_hebrew: 1})
 })
 router.post('/main', (req, res) => {
     const proj = {
