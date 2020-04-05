@@ -24,12 +24,18 @@ router.get('/', (req, res) => {
 
 //find accident by post
 router.post('/', (req, res) => {
-    findByFilter(req, res, {})
+    const label = 'all'
+    console.time(label)
+    findByFilter(req, res, {},label)
 })
 router.post('/latlon', (req, res) => {
-    findByFilter(req, res, { latitude: 1, longitude: 1 , injury_severity_hebrew: 1})
+    const label = 'latlon'
+    console.time(label)
+    findByFilter(req, res, { latitude: 1, longitude: 1 , injury_severity_hebrew: 1}, label)
 })
 router.post('/main', (req, res) => {
+    const label = 'main'
+    console.time(label)
     const proj = {
         latitude: 1, longitude: 1,
         accident_timestamp: 1, day_in_week_hebrew: 1, day_night_hebrew: 1, accident_year: 1,
@@ -37,15 +43,17 @@ router.post('/main', (req, res) => {
         accident_yishuv_name: 1, street1_hebrew: 1, street2_hebrew: 1, road_segment_name: 1, road_type_hebrew: 1, accident_type_hebrew: 1,
         speed_limit_hebrew: 1, multi_lane_hebrew: 1, one_lane_hebrew: 1, road_width_hebrew: 1
     }
-    findByFilter(req, res, proj)
+    findByFilter(req, res, proj, label);
 })
 
-findByFilter = (req, res, proj) => {
+findByFilter = (req, res, proj, label) => {
+    console.time("find");
     if (!req.body) {
         return res.status(400).send("request boddy is missing!")
     }
     AccidentMoedel.find(req.body, proj)
         .then(doc => {
+            console.timeEnd(label);
             return res.jsonp(doc)
         })
         .catch(err => {
