@@ -1,5 +1,6 @@
 let express = require("express")
 let AccidentMoedel = require("../models/accidents.model")
+const cache = require('../middlewares/cache')
 let router = express.Router()
 
 //http://localhost:5000/api/v1/accident
@@ -23,19 +24,21 @@ router.get('/', (req, res) => {
 })
 
 //find accident by post
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
     const label = 'all'
-    console.time(label)
-    findByFilter(req, res, {},label)
+    findByFilter(req, res, next, {}, label)
 })
-router.post('/latlon', (req, res) => {
+router.post('/latlon', 
+    cache.get,
+    (req, res, next) => {
     const label = 'latlon'
-    console.time(label)
-    findByFilter(req, res, { latitude: 1, longitude: 1 , injury_severity_hebrew: 1}, label)
+    findByFilter(req, res, next, { latitude: 1, longitude: 1 , injury_severity_hebrew: 1}, label)
 })
-router.post('/main', (req, res) => {
+
+router.post('/main', 
+    cache.get,
+    (req, res, next) => {
     const label = 'main'
-    console.time(label)
     const proj = {
         latitude: 1, longitude: 1,
         accident_timestamp: 1, day_in_week_hebrew: 1, day_night_hebrew: 1, accident_year: 1,
@@ -43,16 +46,18 @@ router.post('/main', (req, res) => {
         accident_yishuv_name: 1, street1_hebrew: 1, street2_hebrew: 1, road_segment_name: 1, road_type_hebrew: 1, accident_type_hebrew: 1,
         speed_limit_hebrew: 1, multi_lane_hebrew: 1, one_lane_hebrew: 1, road_width_hebrew: 1
     }
-    findByFilter(req, res, proj, label);
-})
+    findByFilter(req, res, next, proj, label)
+    }
+)
 
-findByFilter = (req, res, proj, label) => {
-    console.time("find");
+findByFilter_old = (req, res, next, proj, label) => {
     if (!req.body) {
         return res.status(400).send("request boddy is missing!")
     }
+    console.time(label)
     AccidentMoedel.find(req.body, proj)
         .then(doc => {
+            cache.set1(req, doc);
             console.timeEnd(label);
             return res.jsonp(doc)
         })
@@ -60,6 +65,29 @@ findByFilter = (req, res, proj, label) => {
             return res.status(500).jsonp(err)
         })
 }
+
+findByFilter = async  (req, res, next, proj, label) => {
+    if (!req.body) {
+        return res.status(400).send("request boddy is missing!")
+    }
+    try{
+        console.time(label)
+        const data = await  AccidentMoedel.find(req.body, proj)
+        cache.set1(req, data);
+        console.timeEnd(label);
+        res.jsonp(data)
+    }
+    catch(e) {
+        res.status(500).jsonp(err)
+    }
+    // finally{
+    //     next()
+    // }
+  }
+responseHandler =(res,data) =>{
+    res.status(200).jsonp(data)
+}
+
 //count by query
 router.post('/count', (req, res) => {
     if (!req.body) {
