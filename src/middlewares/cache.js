@@ -2,6 +2,7 @@ const NodeCache = require('node-cache')
 
 // stdTTL: time to live in seconds for every generated cache element.
 const cacheTime = 7*24* 60* 60;
+//const cacheTime = 5* 60;
 const cache = new NodeCache({ stdTTL: cacheTime })
 
 function getKeyFromRequest(req) {
@@ -15,11 +16,20 @@ function getKeyFromRequest(req) {
   }
 }
 
-function set1(req, data) {
-  //console.log("set cache1")
+function getRes(req) {
   const key = getKeyFromRequest(req)
-  cache.set(key, data)
- //return next()
+  const data = cache.get(key)
+  if (data) {
+    return data;
+  }
+  else
+    return null;
+}
+
+function setRes(req, data) {
+  //console.log("setInline")
+  const key = getKeyFromRequest(req)
+  return cache.set(key, data)
 }
 
 function set(req, res, next) {
@@ -38,4 +48,4 @@ function get(req, res, next) {
   return next()
 }
 
-module.exports = { get, set, set1 }
+module.exports = { get, set, getRes, setRes }

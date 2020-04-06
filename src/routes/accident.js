@@ -24,31 +24,57 @@ router.get('/', (req, res) => {
 })
 
 //find accident by post
-router.post('/', (req, res, next) => {
-    const label = 'all'
-    findByFilter(req, res, next, {}, label)
-})
-router.post('/latlon', 
-    cache.get,
-    (req, res, next) => {
-    const label = 'latlon'
-    findByFilter(req, res, next, { latitude: 1, longitude: 1 , injury_severity_hebrew: 1}, label)
-})
-
-router.post('/main', 
-    cache.get,
-    (req, res, next) => {
-    const label = 'main'
-    const proj = {
-        latitude: 1, longitude: 1,
-        accident_timestamp: 1, day_in_week_hebrew: 1, day_night_hebrew: 1, accident_year: 1,
-        injured_type_hebrew: 1, injury_severity_hebrew: 1, vehicle_vehicle_type_hebrew: 1, sex_hebrew: 1, age_group_hebrew: 1, population_type_hebrew: 1,
-        accident_yishuv_name: 1, street1_hebrew: 1, street2_hebrew: 1, road_segment_name: 1, road_type_hebrew: 1, accident_type_hebrew: 1,
-        speed_limit_hebrew: 1, multi_lane_hebrew: 1, one_lane_hebrew: 1, road_width_hebrew: 1
-    }
-    findByFilter(req, res, next, proj, label)
-    }
+router.post('/',  (req, res, next) => { controller(req, res, next, "all") }
 )
+router.post('/latlon',  (req, res, next) => { controller(req, res, next, "latlon") }
+    )
+
+router.post('/main',
+    (req, res, next) => { controller(req, res, next, "main") }
+)
+
+controller = async (req, res, next, type) => {
+    inputValidations(req, res, next);
+    let data = await cache.getRes(req)
+    if (data === null) {
+        const proj = getProjByType(type)
+        data = await queryDB(res, req.body, proj, type)
+    }
+    if (data !== null) {
+        cache.setRes(req, data);
+    }
+    responseHandler(res, data);
+}
+getProjByType = (type) =>{
+    let proj = {}
+    if (type === "main")
+        proj ={
+            latitude: 1, longitude: 1,
+            accident_timestamp: 1, day_in_week_hebrew: 1, day_night_hebrew: 1, accident_year: 1,
+            injured_type_hebrew: 1, injury_severity_hebrew: 1, vehicle_vehicle_type_hebrew: 1, sex_hebrew: 1, age_group_hebrew: 1, population_type_hebrew: 1,
+            accident_yishuv_name: 1, street1_hebrew: 1, street2_hebrew: 1, road_segment_name: 1, road_type_hebrew: 1, accident_type_hebrew: 1,
+            speed_limit_hebrew: 1, multi_lane_hebrew: 1, one_lane_hebrew: 1, road_width_hebrew: 1
+        }
+    else if (type === "latlon") 
+        proj ={ latitude: 1, longitude: 1, injury_severity_hebrew: 1 }  
+    return proj;    
+}
+inputValidations = (req, res, next) => {
+    if (!req.body) {
+        return res.status(400).send("request boddy is missing!")
+    }
+}
+queryDB = async (res, conditions, proj, label) => {
+    try {
+        console.time(label)
+        const data = await AccidentMoedel.find(conditions, proj)
+        console.timeEnd(label);
+        return data;
+    }
+    catch (e) {
+        res.status(500).jsonp(err)
+    }
+}
 
 findByFilter_old = (req, res, next, proj, label) => {
     if (!req.body) {
@@ -66,25 +92,25 @@ findByFilter_old = (req, res, next, proj, label) => {
         })
 }
 
-findByFilter = async  (req, res, next, proj, label) => {
+findByFilter = async (req, res, next, proj, label) => {
     if (!req.body) {
         return res.status(400).send("request boddy is missing!")
     }
-    try{
+    try {
         console.time(label)
-        const data = await  AccidentMoedel.find(req.body, proj)
+        const data = await AccidentMoedel.find(req.body, proj)
         cache.set1(req, data);
         console.timeEnd(label);
         res.jsonp(data)
     }
-    catch(e) {
+    catch (e) {
         res.status(500).jsonp(err)
     }
     // finally{
     //     next()
     // }
-  }
-responseHandler =(res,data) =>{
+}
+responseHandler = (res, data) => {
     res.status(200).jsonp(data)
 }
 
