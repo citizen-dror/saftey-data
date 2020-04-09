@@ -119,7 +119,7 @@ router.post('/count', (req, res) => {
     if (!req.body) {
         return res.status(400).send("request boddy is missing!")
     }
-    AccidentMoedel.count(req.body)
+    AccidentMoedel.countDocuments(req.body)
         .then(doc => {
             return res.jsonp(doc)
         })
@@ -168,6 +168,7 @@ groupByYear = (req, res) => {
 
 // http://localhost:3000/person/mike
 router.get('/person/:name', (req, res) => {
+   
     res.send(`you asked for person ${req.params.name}`)
 })
 
