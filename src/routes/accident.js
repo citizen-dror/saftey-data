@@ -2,6 +2,7 @@ let express = require("express")
 let AccidentMoedel = require("../models/accidents.model")
 const cache = require('../middlewares/cache')
 let router = express.Router()
+const isUseCache = true
 
 //http://localhost:5000/api/v1/accident
 //http://localhost:5000/api/v1/accident?year=2016
@@ -35,12 +36,14 @@ router.post('/main',
 
 controller = async (req, res, next, type) => {
     inputValidations(req, res, next);
-    let data = await cache.getRes(req)
+    let data = null;
+    if (isUseCache) 
+        data = await cache.getRes(req)
     if (data === null) {
         const proj = getProjByType(type)
         data = await queryDB(res, req.body, proj, type)
     }
-    if (data !== null) {
+    if (data !== null && isUseCache) {
         cache.setRes(req, data);
     }
     responseHandler(res, data);
