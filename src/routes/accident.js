@@ -2,7 +2,7 @@ let express = require("express")
 let AccidentMoedel = require("../models/accidents.model")
 const cache = require('../middlewares/cache')
 let router = express.Router()
-const isUseCache = true
+const isUseCache = false
 
 //http://localhost:5000/api/v1/accident
 //http://localhost:5000/api/v1/accident?year=2016
