@@ -1,9 +1,10 @@
-let mongoose  = require ('mongoose')
+const mongoose = require('mongoose');
 
-let ImageSchema = mongoose.Schema({ 
-    filename:String,
-    contentType: String,
-    title: String,
-    data: Buffer
-})
-module.exports = mongoose.model('Image', ImageSchema)
+const ImageSchema = mongoose.Schema({
+  filename: String,
+  contentType: String,
+  title: String,
+  createDate: Date,
+  data: Buffer,
+});
+module.exports = mongoose.model('Image', ImageSchema);
