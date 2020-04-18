@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
 const ImageSchema = mongoose.Schema({
-  filename: String,
-  contentType: String,
+  filename: { type: String, required: true },
+  contentType: { type: String, required: true },
   title: String,
-  createDate: Date,
-  data: Buffer,
+  tags: { type: Array },
+  createdAt: { type: Date, required: true, default: Date.now },
+  data: { type: Buffer, required: true },
 });
 module.exports = mongoose.model('Image', ImageSchema);

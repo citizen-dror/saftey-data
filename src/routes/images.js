@@ -15,26 +15,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-
-router.post('/', upload.single('image'), (req, res) => {
-  if (!req.body) {
-    return res.status(400).send('request boddy is missing!');
-  }
-  // console.log(req.body.title)
-  console.log(req.file.originalname);
-  // console.log(req.file)
-  const newImg = new ImgModel();
-  newImg.filename = req.file.originalname;
-  newImg.contentType = req.file.mimetype;
-  newImg.title = req.body.title;
-  newImg.data = fs.readFileSync(`./uploads/${req.file.originalname}`);
-  newImg.save();
-  return res.send(`got image ${req.file.originalname}`);
-});
-
 const findImageInDb = (req, res, filename) => {
   ImgModel.findOne({ filename }, (err, file) => {
-    // Check if file
+    // Check if file exists
     if (!file || file.length === 0) {
       return res.status(404).json({
         err: 'No file exists',
@@ -62,6 +45,31 @@ const findImageInDb = (req, res, filename) => {
     }
   });
 };
+
+router.post('/', upload.single('image'), (req, res) => {
+  if (!req.body) {
+    return res.status(400).send('request boddy is missing!');
+  }
+  // console.log(req.body.title)
+  console.log(req.file.originalname);
+  // console.log(req.file)
+  const newImg = new ImgModel();
+  newImg.filename = req.file.originalname;
+  newImg.contentType = req.file.mimetype;
+  newImg.title = req.body.title;
+  newImg.tags = JSON.parse(req.body.tags);
+  newImg.data = fs.readFileSync(`./uploads/${req.file.originalname}`);
+  newImg.save();
+  return res.send(`got image ${req.file.originalname}`);
+});
+
+router.get('/tags/:tag', (req, res) => {
+  const cond = { tags: req.params.tag };
+  ImgModel.find(cond, { data: 0 })
+    .then((doc) => res.jsonp(doc))
+    .catch((err) => res.status(500).jsonp(err));
+  return true;
+});
 
 router.get('/:filename', (req, res) => {
   const filePath = `./uploads/${req.params.filename}`;
