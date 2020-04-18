@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const multer = require('multer');
+const path = require('path');
 const ImgModel = require('../models/images.model');
 
 const router = express.Router();
@@ -31,8 +32,8 @@ router.post('/', upload.single('image'), (req, res) => {
   return res.send(`got image ${req.file.originalname}`);
 });
 
-router.get('/:filename', (req, res) => {
-  ImgModel.findOne({ filename: req.params.filename }, (err, file) => {
+const findImageInDb = (req, res, filename) => {
+  ImgModel.findOne({ filename }, (err, file) => {
     // Check if file
     if (!file || file.length === 0) {
       return res.status(404).json({
@@ -45,10 +46,11 @@ router.get('/:filename', (req, res) => {
       // const readstream = gfs.createReadStream(file.filename)
       // readstream.pipe(res)
       try {
-        fs.writeFileSync(`./uploads/${file.filename}`, file.data);
-        // fs.writeFileSync(__dirname + '/static/assets/tmp/tmp-jsa-header.png', file.data);
-        // console.log("Stored an image 'tmp-jsa-header.png' in '/static/assets/tmp' folder.");
-        return res.send(`got image ${file.filename}`);
+        const fileName = `./uploads/${file.filename}`;
+        // const fileName = `../static/assets/tmp/${file.filename}`;
+        fs.writeFileSync(fileName, file.data);
+        return res.sendFile(path.join(__dirname, '../../uploads', file.filename));
+        // return res.send(`got image ${file.filename}`);
       } catch (e) {
         console.log(e);
         return res.status(500).jsonp(e);
@@ -58,6 +60,17 @@ router.get('/:filename', (req, res) => {
         err: 'Not an image',
       });
     }
+  });
+};
+
+router.get('/:filename', (req, res) => {
+  const filePath = `./uploads/${req.params.filename}`;
+  fs.access(filePath, fs.F_OK, (err) => {
+    if (err) {
+      findImageInDb(req, res, req.params.filename);
+    }
+    // file exists
+    return res.sendFile(path.join(__dirname, '../../uploads', req.params.filename));
   });
 });
 

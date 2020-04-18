@@ -4,16 +4,15 @@ const bodyParser = require('body-parser');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
-
 // eslint-disable-next-line no-unused-vars
 const db = require('./src/database');
-
 const usersRoute = require('./src/routes/users');
 const hazardRoue = require('./src/routes/hazards');
 const accidentRoute = require('./src/routes/accident');
 const cityRoute = require('./src/routes/city');
 const imgRoute = require('./src/routes/images');
 
+app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   console.log(`${new Date().toString()} => ${req.originalUrl}`, req.body);
