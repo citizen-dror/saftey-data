@@ -57,6 +57,7 @@ router.post('/', upload.single('image'), (req, res) => {
   newImg.filename = req.file.originalname;
   newImg.contentType = req.file.mimetype;
   newImg.title = req.body.title;
+  newImg.place = req.body.place;
   newImg.tags = JSON.parse(req.body.tags);
   newImg.data = fs.readFileSync(`./uploads/${req.file.originalname}`);
   newImg.save();
@@ -65,6 +66,14 @@ router.post('/', upload.single('image'), (req, res) => {
 
 router.get('/tags/:tag', (req, res) => {
   const cond = { tags: req.params.tag };
+  ImgModel.find(cond, { data: 0 })
+    .then((doc) => res.jsonp(doc))
+    .catch((err) => res.status(500).jsonp(err));
+  return true;
+});
+
+router.get('/place/:place', (req, res) => {
+  const cond = { place: req.params.place };
   ImgModel.find(cond, { data: 0 })
     .then((doc) => res.jsonp(doc))
     .catch((err) => res.status(500).jsonp(err));
