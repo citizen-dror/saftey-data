@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+// Make Mongoose use `findOneAndUpdate()` see https://mongoosejs.com/docs/deprecations.html#-findandmodify-
+mongoose.set('useFindAndModify', false);
+
 const user = 'nodejsuser1';
 const password = 'nodejs2020';
 const dbName = 'test';
