@@ -80,6 +80,32 @@ router.post('/', upload.single('image'), (req, res, next) => {
   return true;
 });
 
+router.put('/props/', async (req, res) => {
+  if (!req.body) {
+    return res.status(400).send('request boddy is missing!');
+  }
+  // console.log(req.body.title)
+  console.log(req.body.filename);
+  const filter = { filename: req.body.filename };
+  const update = {
+    titlehe: req.body.titlehe,
+    texthe: req.body.texthe,
+    titleen: req.body.titleen,
+    texten: req.body.texten,
+    titlear: req.body.titlear,
+    textar: req.body.textar,
+    place: req.body.place,
+    tags: req.body.tags.split(','),
+  };
+  // `doc` is the document _after_ `update` was applied because of
+  // `new: true`
+  await ImgModel.findOneAndUpdate(filter, update, {
+    new: true,
+  });
+  // remove data from return answer to make it lighter
+  return res.status(200).jsonp('ok');
+});
+
 router.put('/', upload.single('image'), async (req, res) => {
   if (!req.body) {
     return res.status(400).send('request boddy is missing!');

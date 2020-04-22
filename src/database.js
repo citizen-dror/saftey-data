@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 // Make Mongoose use `findOneAndUpdate()` see https://mongoosejs.com/docs/deprecations.html#-findandmodify-
 mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
 
 const user = 'nodejsuser1';
 const password = 'nodejs2020';
