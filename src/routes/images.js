@@ -68,7 +68,7 @@ router.post('/', upload.single('image'), (req, res, next) => {
   newImg.titlear = req.body.titlear;
   newImg.textar = req.body.textar;
   newImg.place = req.body.place;
-  newImg.tags = JSON.parse(req.body.tags);
+  newImg.tags = req.body.tags.split(',');
   newImg.data = fs.readFileSync(`./uploads/${req.file.originalname}`);
   newImg.save((err) => {
     if (err) {
@@ -95,7 +95,7 @@ router.put('/props/', async (req, res) => {
     titlear: req.body.titlear,
     textar: req.body.textar,
     place: req.body.place,
-    tags: req.body.tags.split(','),
+    tags: req.body.tags,
   };
   // `doc` is the document _after_ `update` was applied because of
   // `new: true`
