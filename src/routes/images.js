@@ -68,6 +68,7 @@ router.post('/', upload.single('image'), (req, res, next) => {
   newImg.titlear = req.body.titlear;
   newImg.textar = req.body.textar;
   newImg.place = req.body.place;
+  newImg.index = req.body.index;
   newImg.tags = req.body.tags.split(',');
   newImg.data = fs.readFileSync(`./uploads/${req.file.originalname}`);
   newImg.save((err) => {
@@ -96,6 +97,7 @@ router.put('/props/', async (req, res) => {
     textar: req.body.textar,
     place: req.body.place,
     tags: req.body.tags,
+    index: req.body.index,
   };
   // `doc` is the document _after_ `update` was applied because of
   // `new: true`
@@ -138,7 +140,7 @@ const getProjectionByLang = (lang) => {
   let projection = null;
   let progLang = null;
   const baseProjection = {
-    _id: 1, filename: 1, contentType: 1, place: 1, tags: 1, createdAt: 1,
+    _id: 1, filename: 1, contentType: 1, place: 1, tags: 1, index: 1, createdAt: 1,
   };
   if (lang === 'he') progLang = { titlehe: 1, texthe: 1 };
   else if (lang === 'en') progLang = { titleen: 1, texten: 1 };
@@ -151,7 +153,7 @@ router.get('/tags/:lang/:tag', (req, res) => {
   const { lang, tag } = req.params;
   const projection = getProjectionByLang(lang);
   const cond = { tags: tag };
-  ImgModel.find(cond, projection)
+  ImgModel.find(cond, projection).sort({ index: 1 })
     .then((doc) => res.jsonp(doc))
     .catch((err) => res.status(500).jsonp(err));
   return true;

@@ -11,6 +11,7 @@ const ImageSchema = mongoose.Schema({
   textar: { type: String },
   place: { type: String },
   tags: { type: Array },
+  index: { type: Number },
   createdAt: { type: Date, required: true, default: Date.now },
   data: { type: Buffer, required: true },
 });
