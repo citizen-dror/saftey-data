@@ -15,35 +15,24 @@ const router = express.Router();
 // });
 // const upload = multer({ storage });
 
-const findImageInDb = (req, res, filename) => {
-  ImgModel.findOne({ filename }, (err, file) => {
-    // Check if file exists
+
+const findImageInDb = async (filename) => {
+  try {
+    const file = await ImgModel.findOne({ filename }).exec();
     if (!file || file.length === 0) {
-      return res.status(404).json({
-        err: 'No file exists',
-      });
+      return (404); // 'No file exists'
     }
-    // Check if image
-    if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
-      // Read output to browser
-      // const readstream = gfs.createReadStream(file.filename)
-      // readstream.pipe(res)
-      try {
-        const fileName = `./uploads/${file.filename}`;
-        // const fileName = `../static/assets/tmp/${file.filename}`;
-        fs.writeFileSync(fileName, file.data);
-        return res.sendFile(path.join(__dirname, '../../uploads', file.filename));
-        // return res.send(`got image ${file.filename}`);
-      } catch (e) {
-        // console.log(e);
-        return res.status(500).jsonp(e);
-      }
-    } else {
-      return res.status(404).json({
-        err: 'Not an image',
-      });
+    if (file.contentType !== 'image/png' && file.contentType !== 'image/jpeg') {
+      console.log('Not an image');
+      return (404);
     }
-  });
+    // console.log(file.filename);
+    const fileName = `./uploads/${file.filename}`;
+    fs.writeFileSync(fileName, file.data);
+    return (200);
+  } catch (err) {
+    return 500;
+  }
 };
 
 // const handleError = (res, err) => {
@@ -169,14 +158,25 @@ router.get('/place/:lang/:city', (req, res) => {
   return true;
 });
 
-router.get('/:filename', (req, res) => {
+router.get('/:filename', async (req, res) => {
   const filePath = `./uploads/${req.params.filename}`;
-  fs.access(filePath, fs.F_OK, (err) => {
+  let foundFile = true;
+  await fs.access(filePath, fs.F_OK, async (err) => {
     if (err) {
-      findImageInDb(req, res, req.params.filename);
+      foundFile = false;
+      await findImageInDb(req.params.filename)
+        .then(((status) => {
+          if (status === 200) {
+            return res.sendFile(path.join(__dirname, '../../uploads', req.params.filename));
+          } if (status === 404) {
+            return res.status(status).json({
+              err: 'No file exists',
+            });
+          } return res.status(500).json('error');
+        }));
+      // file exists
     }
-    // file exists
-    return res.sendFile(path.join(__dirname, '../../uploads', req.params.filename));
+    if (foundFile) return res.sendFile(path.join(__dirname, '../../uploads', req.params.filename));
   });
 });
 
