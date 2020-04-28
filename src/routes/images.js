@@ -16,7 +16,7 @@ const router = express.Router();
 // const upload = multer({ storage });
 
 
-const findImageInDb = async (filename) => {
+const fetchImageFromDb = async (filename) => {
   try {
     const file = await ImgModel.findOne({ filename }).exec();
     if (!file || file.length === 0) {
@@ -33,6 +33,40 @@ const findImageInDb = async (filename) => {
   } catch (err) {
     return 500;
   }
+};
+
+const prepareImages = async (array) => {
+  array.forEach((element) => {
+    const filePath = `./uploads/${element.filename}`;
+    fs.access(filePath, fs.F_OK, async (err) => {
+      if (err) {
+        fetchImageFromDb(element.filename);
+      }
+    });
+  });
+  return null;
+};
+
+const countImages = async (query) => {
+  try {
+    const count = await ImgModel.countDocuments(query).exec();
+    return count;
+  } catch (error) {
+    return -1;
+  }
+};
+
+const getProjectionByLang = (lang) => {
+  let projection = null;
+  let progLang = null;
+  const baseProjection = {
+    _id: 1, filename: 1, contentType: 1, place: 1, tags: 1, index: 1, createdAt: 1,
+  };
+  if (lang === 'he') progLang = { titlehe: 1, texthe: 1 };
+  else if (lang === 'en') progLang = { titleen: 1, texten: 1 };
+  else progLang = { titlear: 1, textar: 1 };
+  projection = { ...baseProjection, ...progLang };
+  return projection;
 };
 
 // const handleError = (res, err) => {
@@ -125,25 +159,15 @@ const findImageInDb = async (filename) => {
 //   return res.status(200).jsonp(doc);
 // });
 
-const getProjectionByLang = (lang) => {
-  let projection = null;
-  let progLang = null;
-  const baseProjection = {
-    _id: 1, filename: 1, contentType: 1, place: 1, tags: 1, index: 1, createdAt: 1,
-  };
-  if (lang === 'he') progLang = { titlehe: 1, texthe: 1 };
-  else if (lang === 'en') progLang = { titleen: 1, texten: 1 };
-  else progLang = { titlear: 1, textar: 1 };
-  projection = { ...baseProjection, ...progLang };
-  return projection;
-};
-
 router.get('/tags/:lang/:tag', (req, res) => {
   const { lang, tag } = req.params;
   const projection = getProjectionByLang(lang);
   const cond = { tags: tag };
   ImgModel.find(cond, projection).sort({ index: 1 })
-    .then((doc) => res.jsonp(doc))
+    .then((doc) => {
+      prepareImages(doc);
+      return res.jsonp(doc);
+    })
     .catch((err) => res.status(500).jsonp(err));
   return true;
 });
@@ -153,9 +177,20 @@ router.get('/place/:lang/:city', (req, res) => {
   const projection = getProjectionByLang(lang);
   const cond = { place: city };
   ImgModel.find(cond, projection)
-    .then((doc) => res.jsonp(doc))
+    .then((doc) => {
+      prepareImages(doc);
+      res.jsonp(doc);
+    })
     .catch((err) => res.status(500).jsonp(err));
   return true;
+});
+
+router.get('/count/', async (req, res) => {
+  const count = await countImages({});
+  if (count >= 0) {
+    return res.status(200).json({ count });
+  }
+  return res.status(500).json('error');
 });
 
 router.get('/:filename', async (req, res) => {
@@ -164,7 +199,7 @@ router.get('/:filename', async (req, res) => {
   await fs.access(filePath, fs.F_OK, async (err) => {
     if (err) {
       foundFile = false;
-      await findImageInDb(req.params.filename)
+      await fetchImageFromDb(req.params.filename)
         .then(((status) => {
           if (status === 200) {
             return res.sendFile(path.join(__dirname, '../../uploads', req.params.filename));
