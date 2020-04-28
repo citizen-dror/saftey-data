@@ -1,19 +1,19 @@
 const express = require('express');
 const fs = require('fs');
-const multer = require('multer');
+// const multer = require('multer');
 const path = require('path');
 const ImgModel = require('../models/images.model');
 
 const router = express.Router();
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
-const upload = multer({ storage });
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, './uploads/');
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.originalname);
+//   },
+// });
+// const upload = multer({ storage });
 
 const findImageInDb = (req, res, filename) => {
   ImgModel.findOne({ filename }, (err, file) => {
@@ -35,7 +35,7 @@ const findImageInDb = (req, res, filename) => {
         return res.sendFile(path.join(__dirname, '../../uploads', file.filename));
         // return res.send(`got image ${file.filename}`);
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         return res.status(500).jsonp(e);
       }
     } else {
@@ -51,90 +51,90 @@ const findImageInDb = (req, res, filename) => {
 //   return res.status(500).jsonp(err);
 // };
 
-router.post('/', upload.single('image'), (req, res, next) => {
-  if (!req.body) {
-    return res.status(400).send('request boddy is missing!');
-  }
-  // console.log(req.body.title)
-  console.log(req.file.originalname);
-  // console.log(req.file)
-  const newImg = new ImgModel();
-  newImg.filename = req.file.originalname;
-  newImg.contentType = req.file.mimetype;
-  newImg.titlehe = req.body.titlehe;
-  newImg.texthe = req.body.texthe;
-  newImg.titleen = req.body.titleen;
-  newImg.texten = req.body.texten;
-  newImg.titlear = req.body.titlear;
-  newImg.textar = req.body.textar;
-  newImg.place = req.body.place;
-  newImg.index = req.body.index;
-  newImg.tags = req.body.tags.split(',');
-  newImg.data = fs.readFileSync(`./uploads/${req.file.originalname}`);
-  newImg.save((err) => {
-    if (err) {
-      next(err); // Pass errors to Express.
-    } else {
-      return res.send(`got image ${req.file.originalname}`);
-    }
-  });
-  return true;
-});
+// router.post('/', upload.single('image'), (req, res, next) => {
+//   if (!req.body) {
+//     return res.status(400).send('request boddy is missing!');
+//   }
+//   // console.log(req.body.title)
+//   console.log(req.file.originalname);
+//   // console.log(req.file)
+//   const newImg = new ImgModel();
+//   newImg.filename = req.file.originalname;
+//   newImg.contentType = req.file.mimetype;
+//   newImg.titlehe = req.body.titlehe;
+//   newImg.texthe = req.body.texthe;
+//   newImg.titleen = req.body.titleen;
+//   newImg.texten = req.body.texten;
+//   newImg.titlear = req.body.titlear;
+//   newImg.textar = req.body.textar;
+//   newImg.place = req.body.place;
+//   newImg.index = req.body.index;
+//   newImg.tags = req.body.tags.split(',');
+//   newImg.data = fs.readFileSync(`./uploads/${req.file.originalname}`);
+//   newImg.save((err) => {
+//     if (err) {
+//       next(err); // Pass errors to Express.
+//     } else {
+//       return res.send(`got image ${req.file.originalname}`);
+//     }
+//   });
+//   return true;
+// });
 
-router.put('/props/', async (req, res) => {
-  if (!req.body) {
-    return res.status(400).send('request boddy is missing!');
-  }
-  // console.log(req.body.title)
-  console.log(req.body.filename);
-  const filter = { filename: req.body.filename };
-  const update = {
-    titlehe: req.body.titlehe,
-    texthe: req.body.texthe,
-    titleen: req.body.titleen,
-    texten: req.body.texten,
-    titlear: req.body.titlear,
-    textar: req.body.textar,
-    place: req.body.place,
-    tags: req.body.tags,
-    index: req.body.index,
-  };
-  // `doc` is the document _after_ `update` was applied because of
-  // `new: true`
-  await ImgModel.findOneAndUpdate(filter, update, {
-    new: true,
-  });
-  // remove data from return answer to make it lighter
-  return res.status(200).jsonp('ok');
-});
+// router.put('/props/', async (req, res) => {
+//   if (!req.body) {
+//     return res.status(400).send('request boddy is missing!');
+//   }
+//   // console.log(req.body.title)
+//   console.log(req.body.filename);
+//   const filter = { filename: req.body.filename };
+//   const update = {
+//     titlehe: req.body.titlehe,
+//     texthe: req.body.texthe,
+//     titleen: req.body.titleen,
+//     texten: req.body.texten,
+//     titlear: req.body.titlear,
+//     textar: req.body.textar,
+//     place: req.body.place,
+//     tags: req.body.tags,
+//     index: req.body.index,
+//   };
+//   // `doc` is the document _after_ `update` was applied because of
+//   // `new: true`
+//   await ImgModel.findOneAndUpdate(filter, update, {
+//     new: true,
+//   });
+//   // remove data from return answer to make it lighter
+//   return res.status(200).jsonp('ok');
+// });
 
-router.put('/', upload.single('image'), async (req, res) => {
-  if (!req.body) {
-    return res.status(400).send('request boddy is missing!');
-  }
-  // console.log(req.body.title)
-  console.log(req.file.originalname);
-  const filter = { filename: req.file.originalname };
-  const update = {
-    titlehe: req.body.titlehe,
-    texthe: req.body.texthe,
-    titleen: req.body.titleen,
-    texten: req.body.texten,
-    titlear: req.body.titlear,
-    textar: req.body.textar,
-    place: req.body.place,
-    tags: JSON.parse(req.body.tags),
-    data: fs.readFileSync(`./uploads/${req.file.originalname}`),
-  };
-  // `doc` is the document _after_ `update` was applied because of
-  // `new: true`
-  const doc = await ImgModel.findOneAndUpdate(filter, update, {
-    new: true,
-  });
-  // remove data from return answer to make it lighter
-  delete doc.data;
-  return res.status(200).jsonp(doc);
-});
+// router.put('/', upload.single('image'), async (req, res) => {
+//   if (!req.body) {
+//     return res.status(400).send('request boddy is missing!');
+//   }
+//   // console.log(req.body.title)
+//   console.log(req.file.originalname);
+//   const filter = { filename: req.file.originalname };
+//   const update = {
+//     titlehe: req.body.titlehe,
+//     texthe: req.body.texthe,
+//     titleen: req.body.titleen,
+//     texten: req.body.texten,
+//     titlear: req.body.titlear,
+//     textar: req.body.textar,
+//     place: req.body.place,
+//     tags: JSON.parse(req.body.tags),
+//     data: fs.readFileSync(`./uploads/${req.file.originalname}`),
+//   };
+//   // `doc` is the document _after_ `update` was applied because of
+//   // `new: true`
+//   const doc = await ImgModel.findOneAndUpdate(filter, update, {
+//     new: true,
+//   });
+//   // remove data from return answer to make it lighter
+//   delete doc.data;
+//   return res.status(200).jsonp(doc);
+// });
 
 const getProjectionByLang = (lang) => {
   let projection = null;
