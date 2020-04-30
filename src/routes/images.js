@@ -162,18 +162,18 @@ const getProjectionByLang = (lang) => {
 //   return res.status(200).jsonp(doc);
 // });
 
-// router.get('/tags/:lang/:tag', (req, res) => {
-//   const { lang, tag } = req.params;
-//   const projection = getProjectionByLang(lang);
-//   const cond = { tags: tag };
-//   ImgModel.find(cond, projection).sort({ index: 1 })
-//     .then((doc) => {
-//       prepareImages(doc);
-//       return res.jsonp(doc);
-//     })
-//     .catch((err) => res.status(500).jsonp(err));
-//   return true;
-// });
+router.get('/tags/:lang/:tag', (req, res) => {
+  const { lang, tag } = req.params;
+  const projection = getProjectionByLang(lang);
+  const cond = { tags: tag };
+  ImgModel.find(cond, projection).sort({ index: 1 })
+    .then((doc) => {
+      prepareImages(doc);
+      return res.jsonp(doc);
+    })
+    .catch((err) => res.status(500).jsonp(err));
+  return true;
+});
 
 router.get('/tags/:tag', (req, res) => {
   const { tag } = req.params;
