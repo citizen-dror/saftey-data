@@ -26,6 +26,7 @@ const getProjByType = (type) => {
       street2_hebrew: 1,
       road_segment_name: 1,
       road_type_hebrew: 1,
+      vehicles: 1,
       accident_type_hebrew: 1,
       speed_limit_hebrew: 1,
       multi_lane_hebrew: 1,

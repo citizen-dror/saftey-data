@@ -2,7 +2,7 @@ let mongoose = require ("mongoose")
 
 let AccidentSchema = mongoose.Schema({ 
     _id: String, 
-    accident_year: String,
+    accident_year: Number,
     accident_timestamp: String,
     injury_severity_hebrew: String,
     age_group_hebrew: String,
@@ -16,4 +16,4 @@ let AccidentSchema = mongoose.Schema({
     longitude:String 
 })
 
-module.exports = mongoose.model('Accident', AccidentSchema)
+module.exports = mongoose.model('Accident', AccidentSchema, 'accidents2')
