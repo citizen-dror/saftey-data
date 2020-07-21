@@ -33,7 +33,9 @@ const getProjByType = (type) => {
       one_lane_hebrew: 1,
       road_width_hebrew: 1,
     };
-  } else if (type === 'latlon') { proj = { latitude: 1, longitude: 1, injury_severity_hebrew: 1 }; }
+  } else if (type === 'latlon') { 
+    proj = { latitude: 1, longitude: 1, injury_severity_hebrew: 1 }; 
+  }
   return proj;
 };
 const inputValidations = (req, res) => {
@@ -104,6 +106,33 @@ router.post('/agg', (req, res) => {
     return res.status(400).send('request boddy is missing!');
   }
   AccidentMoedel.aggregate(req.body)
+    .then((doc) => res.jsonp(doc))
+    .catch((err) => res.status(500).jsonp(err));
+  return true;
+});
+
+// aggregate by filter by post
+router.post('/aggmain', (req, res) => {
+  if (!req.body) {
+    return res.status(400).send('request boddy is missing!');
+  }
+  let agg = req.body;
+  const proj = { '$project' : getProjByType('main')};
+  agg.push(proj);
+  AccidentMoedel.aggregate(agg)
+    .then((doc) => res.jsonp(doc))
+    .catch((err) => res.status(500).jsonp(err));
+  return true;
+});
+// aggregate by filter by post
+router.post('/agglatlon', (req, res) => {
+  if (!req.body) {
+    return res.status(400).send('request boddy is missing!');
+  }
+  let agg = req.body;
+  const proj = { '$project' : getProjByType('latlon')};
+  agg.push(proj);
+  AccidentMoedel.aggregate(agg)
     .then((doc) => res.jsonp(doc))
     .catch((err) => res.status(500).jsonp(err));
   return true;
