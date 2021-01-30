@@ -50,7 +50,7 @@ router.post('/', (req, res) => {
   const fs = require('fs');
   fs.writeFile('test.txt', jsonData, (err) => {
     if (err) {
-      console.log(err);
+      logger.log(err);
     }
   });
 }; */

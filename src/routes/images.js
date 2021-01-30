@@ -3,6 +3,7 @@ const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
 const ImgModel = require('../models/images.model');
+const logger = require('../middlewares/logger');
 
 const router = express.Router();
 const storage = multer.diskStorage({
@@ -23,10 +24,10 @@ const fetchImageFromDb = async (filename) => {
       return (404); // 'No file exists'
     }
     if (file.contentType !== 'image/png' && file.contentType !== 'image/jpeg') {
-      console.log('Not an image');
+      logger.info('404 - Not an image');
       return (404);
     }
-    // console.log(file.filename);
+    // logger.log(file.filename);
     const fileName = `./uploads/${file.filename}`;
     fs.writeFileSync(fileName, file.data);
     return (200);
@@ -73,7 +74,7 @@ const getProjectionByLang = (lang) => {
 };
 
 // const handleError = (res, err) => {
-//   console.log(err);
+//   logger.log(err);
 //   return res.status(500).jsonp(err);
 // };
 
@@ -81,9 +82,9 @@ const getProjectionByLang = (lang) => {
 //   if (!req.body) {
 //     return res.status(400).send('request boddy is missing!');
 //   }
-//   // console.log(req.body.title)
-//   console.log(req.file.originalname);
-//   // console.log(req.file)
+//   // logger.log(req.body.title)
+//   logger.log(req.file.originalname);
+//   // logger.log(req.file)
 //   const newImg = new ImgModel();
 //   newImg.filename = req.file.originalname;
 //   newImg.contentType = req.file.mimetype;
@@ -111,8 +112,8 @@ const getProjectionByLang = (lang) => {
 //   if (!req.body) {
 //     return res.status(400).send('request boddy is missing!');
 //   }
-//   // console.log(req.body.title)
-//   console.log(req.body.filename);
+//   // logger.log(req.body.title)
+//   logger.log(req.body.filename);
 //   const filter = { filename: req.body.filename };
 //   const update = {
 //     titlehe: req.body.titlehe,
@@ -138,8 +139,8 @@ const getProjectionByLang = (lang) => {
 //   if (!req.body) {
 //     return res.status(400).send('request boddy is missing!');
 //   }
-//   // console.log(req.body.title)
-//   console.log(req.file.originalname);
+//   // logger.log(req.body.title)
+//   logger.log(req.file.originalname);
 //   const filter = { filename: req.file.originalname };
 //   const update = {
 //     titlehe: req.body.titlehe,

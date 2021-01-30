@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const logger = require('./src/middlewares/logger');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -15,7 +16,7 @@ const imgRoute = require('./src/routes/images');
 app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-  console.log(`${new Date().toString()} => ${req.originalUrl}`, req.body);
+  logger.info(`${new Date().toString()} => ${req.originalUrl}`, req.body);
   next();
 });
 // get react static files
@@ -31,9 +32,10 @@ app.get('/*', (req, res) => {
 });
 
 app.use((req, res) => {
+  logger.info(`404 - ${req.originalUrl}`, req.body);
   res.status(404).send('The url you requested cannot be found.');
 });
 app.use((err) => {
-  console.error(err.stack);
+  logger.error(err.stack);
 });
-app.listen(PORT, () => console.info(`Server has started on ${PORT}`));
+app.listen(PORT, () => logger.info(`Server has started on ${PORT}`));

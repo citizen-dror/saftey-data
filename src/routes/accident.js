@@ -1,6 +1,7 @@
 const express = require('express');
 const AccidentMoedel = require('../models/accidents.model');
 const cache = require('../middlewares/cache');
+const logger = require('../middlewares/logger');
 
 const router = express.Router();
 const isUseCache = false;
@@ -33,8 +34,8 @@ const getProjByType = (type) => {
       one_lane_hebrew: 1,
       road_width_hebrew: 1,
     };
-  } else if (type === 'latlon') { 
-    proj = { latitude: 1, longitude: 1, injury_severity_hebrew: 1 }; 
+  } else if (type === 'latlon') {
+    proj = { latitude: 1, longitude: 1, injury_severity_hebrew: 1 };
   }
   return proj;
 };
@@ -45,9 +46,9 @@ const inputValidations = (req, res) => {
 };
 const queryDB = async (res, conditions, proj, label) => {
   try {
-    console.time(label);
+    logger.profile(label);
     const data = await AccidentMoedel.find(conditions, proj);
-    console.timeEnd(label);
+    logger.profile(label);
     return data;
   } catch (err) {
     return res.status(500).jsonp(err);
@@ -58,11 +59,11 @@ const queryDB = async (res, conditions, proj, label) => {
   if (!req.body) {
     return res.status(400).send('request boddy is missing!');
   }
-  console.time(label);
+  logger.time(label);
   AccidentMoedel.find(req.body, proj)
     .then((doc) => {
       cache.set1(req, doc);
-      console.timeEnd(label);
+      logger.timeEnd(label);
       return res.jsonp(doc);
     })
     .catch((err) => res.status(500).jsonp(err));
@@ -73,10 +74,10 @@ const findByFilter = async (req, res, next, proj, label) => {
     return res.status(400).send('request boddy is missing!');
   }
   try {
-    console.time(label);
+    logger.time(label);
     const data = await AccidentMoedel.find(req.body, proj);
     cache.set1(req, data);
-    console.timeEnd(label);
+    logger.timeEnd(label);
     return res.jsonp(data);
   } catch (e) {
     return res.status(500).jsonp(e);
@@ -116,8 +117,8 @@ router.post('/aggmain', (req, res) => {
   if (!req.body) {
     return res.status(400).send('request boddy is missing!');
   }
-  let agg = req.body;
-  const proj = { '$project' : getProjByType('main')};
+  const agg = req.body;
+  const proj = { $project: getProjByType('main') };
   agg.push(proj);
   AccidentMoedel.aggregate(agg)
     .then((doc) => res.jsonp(doc))
@@ -129,8 +130,8 @@ router.post('/agglatlon', (req, res) => {
   if (!req.body) {
     return res.status(400).send('request boddy is missing!');
   }
-  let agg = req.body;
-  const proj = { '$project' : getProjByType('latlon')};
+  const agg = req.body;
+  const proj = { $project: getProjByType('latlon') };
   agg.push(proj);
   AccidentMoedel.aggregate(agg)
     .then((doc) => res.jsonp(doc))
