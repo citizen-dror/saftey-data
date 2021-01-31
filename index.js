@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const logger = require('./src/middlewares/logger');
+require('dotenv').config();
 
 const PORT = process.env.PORT || 5000;
 const app = express();

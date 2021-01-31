@@ -73,7 +73,7 @@ router.get('/', (req, res) => {
 });
 
 const myKey = process.env.API_KEY;
-router.get('/test', (req, res) => res.status(400).send(`test key ${myKey}`));
+router.get('/test', (req, res) => res.status(200).send(`test key ${myKey}`));
 
 // http://localhost:3000/person/mike
 router.get('/:name-he', (req, res) => {
