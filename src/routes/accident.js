@@ -25,6 +25,8 @@ const getProjByType = (type) => {
       accident_yishuv_name: 1,
       street1_hebrew: 1,
       street2_hebrew: 1,
+      road1: 1,
+      road2: 1,
       road_segment_name: 1,
       road_type_hebrew: 1,
       vehicles: 1,
