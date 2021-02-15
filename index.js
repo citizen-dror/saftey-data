@@ -14,6 +14,7 @@ app.use(
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       'default-src': ['safety-data.herokuapp.com'],
+      'script-src': ['safety-data.herokuapp.com'],
       'img-src': ["'self'", 'safety-data.herokuapp.com', '*.tile.openstreetmap.org', 'data:'],
     },
   }),
