@@ -13,7 +13,8 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      'script-src': ['*'],
+      'default-src': ['https:', "'unsafe-inline'"],
+      'script-src': ['https:', "'unsafe-inline'"],
       'img-src': ["'self'", '*.tile.openstreetmap.org'],
     },
   }),
