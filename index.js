@@ -10,10 +10,19 @@ const PORT = process.env.PORT || 5000;
 
 // Middlewares
 app.use(
-  helmet({
-    contentSecurityPolicy: false,
+  helmet.contentSecurityPolicy({
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'img-src': ["'self'", '*.tile.openstreetmap.org'],
+    },
   }),
 );
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: false,
+//   }),
+// );
+//app.use(helmet());
 
 // eslint-disable-next-line no-unused-vars
 const db = require('./src/database');
