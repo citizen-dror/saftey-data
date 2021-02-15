@@ -13,6 +13,7 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'script-src': ["'self'", 'unsafe-inline'],
       'img-src': ["'self'", '*.tile.openstreetmap.org'],
     },
   }),
@@ -22,7 +23,7 @@ app.use(
 //     contentSecurityPolicy: false,
 //   }),
 // );
-//app.use(helmet());
+// app.use(helmet());
 
 // eslint-disable-next-line no-unused-vars
 const db = require('./src/database');
