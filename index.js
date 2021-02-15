@@ -15,7 +15,7 @@ app.use(
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       'default-src': ['https:', "'unsafe-inline'"],
       'script-src': ['https:', "'unsafe-inline'"],
-      'img-src': ["'self'", '*.tile.openstreetmap.org'],
+      'img-src': ["'self'", 'safety-data.herokuapp.com', '*.tile.openstreetmap.org'],
     },
   }),
 );
