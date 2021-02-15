@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const helmet = require('helmet');
+// const helmet = require('helmet');
 const logger = require('./src/middlewares/logger');
 require('dotenv').config();
 
@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares
-app.use(helmet());
+// app.use(helmet());
 
 // eslint-disable-next-line no-unused-vars
 const db = require('./src/database');
