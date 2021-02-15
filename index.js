@@ -63,4 +63,6 @@ app.use((error, req, res, next) => {
   logger.error(error.stack);
   return res.status(500).send('Unknown Error in the server');
 });
+app.use(express.static(`${__dirname}/`));
+app.use(express.static(path.join(__dirname, 'build/static')));
 app.listen(PORT, () => logger.info(`Server has started on ${PORT}`));
