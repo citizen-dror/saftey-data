@@ -2,11 +2,22 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const logger = require('./src/middlewares/logger');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const limitMainFilter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  max: 50, // limit each IP to 50 requests per windowMs
+  message: 'Too many accounts created from this IP, please try again after a minute',
+});
+const limitAll = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  max: 200, // limit each IP to 200 requests per windowMs
+  message: 'Too many accounts created from this IP, please try again after a minute',
+});
 
 // Middlewares
 app.use(
@@ -24,7 +35,8 @@ app.use(
 //     contentSecurityPolicy: false,
 //   }),
 // );
-// app.use(helmet());
+app.use('/api/v1/accident/aggmain', limitMainFilter);
+app.use(limitAll);
 
 // eslint-disable-next-line no-unused-vars
 const db = require('./src/database');
@@ -37,7 +49,7 @@ const imgRoute = require('./src/routes/images');
 app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-  logger.info(`${new Date().toString()} => ${req.originalUrl}`, req.body);
+  logger.info(`${new Date().toString()} => ${req.originalUrl}:`, req.body);
   next();
 });
 // get react static files
