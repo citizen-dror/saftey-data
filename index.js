@@ -24,13 +24,21 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      'default-src': ['safety-data.herokuapp.com'],
-      'script-src': ['safety-data.herokuapp.com'],
-      'img-src': ["'self'", 'safety-data.herokuapp.com', '*.tile.openstreetmap.org', 'data:'],
+      'img-src': ["'self'", '*.tile.openstreetmap.org', 'data:'],
     },
   }),
 );
-app.disable('x-powered-by');
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
+// app.use(helmet());
 app.use('/api/v1/accident/aggmain', limitMainFilter);
 app.use(limitAll);
 
