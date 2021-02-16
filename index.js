@@ -30,11 +30,7 @@ app.use(
     },
   }),
 );
-// app.use(
-//   helmet({
-//     contentSecurityPolicy: false,
-//   }),
-// );
+app.disable('x-powered-by');
 app.use('/api/v1/accident/aggmain', limitMainFilter);
 app.use(limitAll);
 
