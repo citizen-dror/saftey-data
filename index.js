@@ -46,7 +46,8 @@ app.use(limitAll);
 const db = require('./src/database');
 const usersRoute = require('./src/routes/users');
 const hazardRoue = require('./src/routes/hazards');
-const accidentRoute = require('./src/routes/accident');
+// const accidentRoute = require('./src/routes/accident');
+const accidentRoute = require('./src/components/accidents/accidentAPI');
 const cityRoute = require('./src/routes/city');
 const imgRoute = require('./src/routes/images');
 
@@ -60,6 +61,7 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'build')));
 app.use('/api/v1/users', usersRoute);
 app.use('/api/v1/hazards', hazardRoue);
+// app.use('/api/v1/accident', accidentRoute);
 app.use('/api/v1/accident', accidentRoute);
 app.use('/api/v1/city', cityRoute);
 app.use('/api/v1/img', imgRoute);
