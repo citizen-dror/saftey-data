@@ -20,8 +20,8 @@ const jsonFilters = fs.readFileSync(`${path.join(__dirname, 'filterCols.json')}`
  */
 const FILTER_ARR = JSON.parse(jsonFilters);
 /**
- * create Map form array of pairs. the key is the query-string value, value is the db value.  
- * @param {string} filterName 
+ * create Map form array of pairs. the key is the query-string value, value is the db value.
+ * @param {string} filterName
  */
 const jsonToMap = (filterName) => {
   const objFilter = FILTER_ARR[filterName];
