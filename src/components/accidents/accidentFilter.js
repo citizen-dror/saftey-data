@@ -34,6 +34,8 @@ const mapSex = jsonToMap('sex');
 const mapAge = jsonToMap('age_group');
 const mapPopType = jsonToMap('population_type');
 const mapDayNight = jsonToMap('day_night');
+const mapMonth = jsonToMap('accident_month');
+const mapVehicle = jsonToMap('vehicle_vehicle_type');
 
 function getFilterFromQuery(queryObject, qName, colName, mapFilterValues) {
   const queryPart = queryObject[qName];
@@ -67,6 +69,8 @@ module.exports = function getFilter(queryObject) {
   const filterAge = getFilterFromQuery(queryObject, 'age', 'age_group_hebrew', mapAge);
   const filterPopType = getFilterFromQuery(queryObject, 'pt', 'population_type_hebrew', mapPopType);
   const filterDayNight = getFilterFromQuery(queryObject, 'dn', 'day_night_hebrew', mapDayNight);
+  const filterMonth = getFilterFromQuery(queryObject, 'mn', 'accident_month', mapMonth);
+  const filterVehicle = getFilterFromQuery(queryObject, 'vcl', 'vehicle_vehicle_type_hebrew', mapVehicle);
 
   // return filterSev;
   const arrAnd = [
@@ -78,6 +82,8 @@ module.exports = function getFilter(queryObject) {
   if (filterSex) arrAnd.push(filterSex);
   if (filterPopType) arrAnd.push(filterPopType);
   if (filterDayNight) arrAnd.push(filterDayNight);
+  if (filterMonth) arrAnd.push(filterMonth);
+  if (filterVehicle) arrAnd.push(filterVehicle);
   const filter = { $and: arrAnd };
   return filter;
 };
