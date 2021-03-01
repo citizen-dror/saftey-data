@@ -50,7 +50,7 @@ const mapOneLane = jsonToMap('one_lane');
  * @param {string} colName - column name in db.
  * @param {Map} mapFilterValues - Map of values in query (key) and db (value).
  */
-function getFilterFromQuery(queryObject, qName, colName, mapFilterValues) {
+function getFilterByDictionary(queryObject, qName, colName, mapFilterValues) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
@@ -62,34 +62,39 @@ function getFilterFromQuery(queryObject, qName, colName, mapFilterValues) {
   }
   return null;
 }
+function getFilterByQurey(queryObject, qName, colName) {
+  const queryPart = queryObject[qName];
+  if (queryPart) {
+    const queryValsArr = JSON.parse(`[${queryPart}]`);
+    if (queryValsArr && queryValsArr.length > 0) {
+      const arr = queryValsArr.map((x) => ({ [colName]: x }));
+      const filter = { $or: arr };
+      return filter;
+    }
+  }
+  return null;
+}
 
-// function getFilterInjTypes({ injt }) {
-//   const injTypeArr = JSON.parse(`[${injt}]`);
-//   if (injTypeArr && injTypeArr.length > 0) {
-//     const arr = injTypeArr.map((x) => ({ injured_type_hebrew: mapInjTypes.get(x) }));
-//     const filter = { $or: arr };
-//     return filter;
-//   }
-//   return null;
-// }
+
 
 module.exports = function getFilter(queryObject) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterSev(queryObject);
-  const filterInjType = getFilterFromQuery(queryObject, 'injt', 'injured_type_hebrew', mapInjTypes);
-  const filterSex = getFilterFromQuery(queryObject, 'sex', 'sex_hebrew', mapSex);
-  const filterAge = getFilterFromQuery(queryObject, 'age', 'age_group_hebrew', mapAge);
-  const filterPopType = getFilterFromQuery(queryObject, 'pt', 'population_type_hebrew', mapPopType);
-  const filterDayNight = getFilterFromQuery(queryObject, 'dn', 'day_night_hebrew', mapDayNight);
-  const filterMonth = getFilterFromQuery(queryObject, 'mn', 'accident_month', mapMonth);
-  const filtrtAccidentType = getFilterFromQuery(queryObject, 'acc', 'accident_type_hebrew', mapAccidentType);
-  const filterVehicle = getFilterFromQuery(queryObject, 'vcl', 'vehicle_vehicle_type_hebrew', mapVehicle);
-  const filterRoadType = getFilterFromQuery(queryObject, 'rt', 'road_type_hebrew', mapRoadType);
-  const filterSpeedLimit = getFilterFromQuery(queryObject, 'sp', 'speed_limit_hebrew', mapSpeedLimit);
-  const filterRoadWidth = getFilterFromQuery(queryObject, 'rw', 'road_width_hebrew', mapRoadWidth);
-  const filterMultiLane = getFilterFromQuery(queryObject, 'ml', 'multi_lane_hebrew', mapMultiLane);
-  const filterOneLane = getFilterFromQuery(queryObject, 'ol', 'one_lane_hebrew', mapOneLane);
+  const filterInjType = getFilterByDictionary(queryObject, 'injt', 'injured_type_hebrew', mapInjTypes);
+  const filterCity = getFilterByQurey(queryObject, 'city', 'accident_yishuv_name')
+  const filterSex = getFilterByDictionary(queryObject, 'sex', 'sex_hebrew', mapSex);
+  const filterAge = getFilterByDictionary(queryObject, 'age', 'age_group_hebrew', mapAge);
+  const filterPopType = getFilterByDictionary(queryObject, 'pt', 'population_type_hebrew', mapPopType);
+  const filterDayNight = getFilterByDictionary(queryObject, 'dn', 'day_night_hebrew', mapDayNight);
+  const filterMonth = getFilterByDictionary(queryObject, 'mn', 'accident_month', mapMonth);
+  const filtrtAccidentType = getFilterByDictionary(queryObject, 'acc', 'accident_type_hebrew', mapAccidentType);
+  const filterVehicle = getFilterByDictionary(queryObject, 'vcl', 'vehicle_vehicle_type_hebrew', mapVehicle);
+  const filterRoadType = getFilterByDictionary(queryObject, 'rt', 'road_type_hebrew', mapRoadType);
+  const filterSpeedLimit = getFilterByDictionary(queryObject, 'sp', 'speed_limit_hebrew', mapSpeedLimit);
+  const filterRoadWidth = getFilterByDictionary(queryObject, 'rw', 'road_width_hebrew', mapRoadWidth);
+  const filterMultiLane = getFilterByDictionary(queryObject, 'ml', 'multi_lane_hebrew', mapMultiLane);
+  const filterOneLane = getFilterByDictionary(queryObject, 'ol', 'one_lane_hebrew', mapOneLane);
 
   // return filterSev;
   const arrAnd = [
@@ -97,6 +102,7 @@ module.exports = function getFilter(queryObject) {
     filterSev,
   ];
   if (filterInjType) arrAnd.push(filterInjType);
+  if (filterCity) arrAnd.push(filterCity);
   if (filterAge) arrAnd.push(filterAge);
   if (filterSex) arrAnd.push(filterSex);
   if (filterPopType) arrAnd.push(filterPopType);
