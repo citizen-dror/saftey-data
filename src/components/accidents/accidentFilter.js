@@ -10,46 +10,48 @@ const getFilterSev = ({ sev }) => {
   return { injury_severity_hebrew: sevInj };
 };
 
+const getinitInjTypes = ({ injt }) => {
+  // {"$or":
+  // [{"injured_type_hebrew" : "הולך רגל"},
+  // {"injured_type_hebrew" : "נהג - אופניים"},
+  // ]}
+  const injTypeArr = JSON.parse(injt);
+  if (injTypeArr && injTypeArr.length > 0) {
+    const arr = [];
+    if (injTypeArr.includes(1)) arr.push({ injured_type_hebrew: 'הולך רגל' });
+    if (injTypeArr.includes(2)) {
+      arr.push({ injured_type_hebrew: 'נהג - אופניים' });
+      arr.push({ injured_type_hebrew: 'נוסע - אופניים (לא נהג)' });
+    }
+    if (injTypeArr.includes(3)) {
+      arr.push({ injured_type_hebrew: 'נהג - רכב לא ידוע' });
+      arr.push({ injured_type_hebrew: 'נוסע - רכב לא ידוע' });
+    }
+    if (injTypeArr.includes(4)) {
+      arr.push({ injured_type_hebrew: 'נהג - אופנוע' });
+      arr.push({ injured_type_hebrew: 'נוסע - אופנוע (לא נהג)' });
+    }
+    if (injTypeArr.includes(5)) {
+      arr.push({ injured_type_hebrew: 'נהג - רכב בעל 4 גלגלים ויותר' });
+      arr.push({ injured_type_hebrew: 'נוסע - רכב בעל 4 גלגלים ויותר' });
+    }
+    const filter = { $or: arr };
+    return filter;
+  }
+  return null;
+};
+
 module.exports = function getFilter(queryObject) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterSev(queryObject);
-  // const filter3 = getinitInjTypes(queryObject);
+  const filterInjType = getinitInjTypes(queryObject);
   // return filterSev;
   const arrAnd = [
     filterYear,
     filterSev,
   ];
+  if (filterInjType) arrAnd.push(filterInjType);
   const filter = { $and: arrAnd };
   return filter;
 };
-
-// const getinitInjTypes = ({ injt }) => {
-//   // {"$or":
-//   // [{"injured_type_hebrew" : "הולך רגל"},
-//   // {"injured_type_hebrew" : "נהג - אופניים"},{"injured_type_hebrew" : "נוסע - אופניים (לא נהג)"}]}
-//   // ]}
-//   if (injt && injt.length > 0) {
-//     const arr = [];
-//     if (injt.includes(1)) arr.push({ injured_type_hebrew: 'הולך רגל' });
-//     if (injt.includes(2)) {
-//       arr.push({ injured_type_hebrew: 'נהג - אופניים' });
-//       arr.push({ injured_type_hebrew: 'נוסע - אופניים (לא נהג)' });
-//     }
-//     if (injt.includes(3)) {
-//       arr.push({ injured_type_hebrew: 'נהג - רכב לא ידוע' });
-//       arr.push({ injured_type_hebrew: 'נוסע - רכב לא ידוע' });
-//     }
-//     if (injt.includes(4)) {
-//       arr.push({ injured_type_hebrew: 'נהג - אופנוע' });
-//       arr.push({ injured_type_hebrew: 'נוסע - אופנוע (לא נהג)' });
-//     }
-//     if (injt.includes(5)) {
-//       arr.push({ injured_type_hebrew: 'נהג - רכב בעל 4 גלגלים ויותר' });
-//       arr.push({ injured_type_hebrew: 'נוסע - רכב בעל 4 גלגלים ויותר' });
-//     }
-//     const filter = { $or: arr };
-//     return filter;
-//   }
-//   return null;
-// };
