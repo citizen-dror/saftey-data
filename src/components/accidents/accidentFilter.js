@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 const getFilterYear = ({ sy, ey }) => {
   const sYear = (sy) ? parseInt(sy, 10) : 2015;
   const eYear = (ey) ? parseInt(ey, 10) : 2019;
@@ -10,22 +13,24 @@ const getFilterSev = ({ sev }) => {
   return { injury_severity_hebrew: sevInj };
 };
 
-const setMapInjTypes = () => {
-  const map = new Map();
-  map.set(1, 'הולך רגל');
-  map.set(2, 'נהג - רכב בעל 4 גלגלים ויותר');
-  map.set(3, 'נוסע - רכב בעל 4 גלגלים ויותר');
-  map.set(4, 'נהג - אופנוע');
-  map.set(5, 'נוסע - אופנוע (לא נהג)');
-  map.set(6, 'נהג - אופניים');
-  map.set(7, 'נוסע - אופניים (לא נהג)');
-  map.set(8, 'נהג - רכב לא ידוע');
-  map.set(9, 'נוסע - רכב לא ידוע');
-  return map;
+const jsonFilters = fs.readFileSync(`${path.join(__dirname, 'filterCols.json')}`);
+/**
+ * array of filters columns. each filter name has array of pairs.
+ * each pair is the query sting value and the db value.
+ */
+const FILTER_ARR = JSON.parse(jsonFilters);
+/**
+ * create Map form array of pairs. the key is the query-string value, value is the db value.  
+ * @param {string} filterName 
+ */
+const jsonToMap = (filterName) => {
+  const objFilter = FILTER_ARR[filterName];
+  return new Map(objFilter);
 };
-const mapInjTypes = setMapInjTypes(setMapInjTypes);
+// List of Maps, each Map is one cloumn in db
+const mapInjTypes = jsonToMap('InjType');
 
-function getinitInjTypes({ injt }) {
+function getFilterInjTypes({ injt }) {
   const injTypeArr = JSON.parse(`[${injt}]`);
   if (injTypeArr && injTypeArr.length > 0) {
     const arr = injTypeArr.map((x) => ({ injured_type_hebrew: mapInjTypes.get(x) }));
@@ -39,7 +44,7 @@ module.exports = function getFilter(queryObject) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterSev(queryObject);
-  const filterInjType = getinitInjTypes(queryObject);
+  const filterInjType = getFilterInjTypes(queryObject);
   // return filterSev;
   const arrAnd = [
     filterYear,
