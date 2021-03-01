@@ -45,3 +45,9 @@ exports.accident_getList_DAL = (agg, type) => {
 };
 
 exports.accident_getGroupBy_DAL = (agg) => AccidentMoedel2.aggregate(agg);
+
+exports.accident_find_DAL = (find, type) => {
+  const proj = getProjByType(type);
+  return AccidentMoedel2.find(find, proj);
+  // return AccidentMoedel2.find({ accident_year: 2016 },  proj)
+};

@@ -1,4 +1,5 @@
 const express = require('express');
+const url = require('url');
 const controller = require('./accidentController');
 // const cache = require('../../middlewares/cache');
 
@@ -19,6 +20,12 @@ router.post('/aggmain', (req, res) => {
 // get list of accidets aggregate a filter by query body, return lat-lon projection
 router.post('/agglatlon', (req, res) => {
   controller.accident_getList(req, res, 'latlon');
+});
+
+// get list of accidets aggregate a filter by query body, return deteail projection
+router.get('/', (req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  controller.accident_get(req, res, queryObject);
 });
 
 // // aggregate by filter by post
