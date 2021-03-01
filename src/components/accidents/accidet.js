@@ -16,4 +16,4 @@ const AccidentSchema = mongoose.Schema({
   longitude: String,
 });
 
-module.exports = mongoose.model('Accident', AccidentSchema, 'accidents');
+module.exports = mongoose.model('Accident2', AccidentSchema, 'accidents');
