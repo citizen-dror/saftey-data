@@ -36,7 +36,19 @@ const mapPopType = jsonToMap('population_type');
 const mapDayNight = jsonToMap('day_night');
 const mapMonth = jsonToMap('accident_month');
 const mapVehicle = jsonToMap('vehicle_vehicle_type');
+const mapRoadType = jsonToMap('road_type');
+const mapSpeedLimit = jsonToMap('speed_limit');
+const mapRoadWidth = jsonToMap('road_width');
+const mapMultiLane = jsonToMap('multi_lane');
+const mapOneLane = jsonToMap('one_lane');
 
+/**
+ * create filter from query string sentence
+ * @param {ParsedUrlQuery} queryObject - query objcet form the request
+ * @param {string} qName - query parmter name.
+ * @param {string} colName - column name in db.
+ * @param {Map} mapFilterValues - Map of values in query (key) and db (value).
+ */
 function getFilterFromQuery(queryObject, qName, colName, mapFilterValues) {
   const queryPart = queryObject[qName];
   if (queryPart) {
@@ -71,6 +83,11 @@ module.exports = function getFilter(queryObject) {
   const filterDayNight = getFilterFromQuery(queryObject, 'dn', 'day_night_hebrew', mapDayNight);
   const filterMonth = getFilterFromQuery(queryObject, 'mn', 'accident_month', mapMonth);
   const filterVehicle = getFilterFromQuery(queryObject, 'vcl', 'vehicle_vehicle_type_hebrew', mapVehicle);
+  const filterRoadType = getFilterFromQuery(queryObject, 'rt', 'road_type_hebrew', mapRoadType);
+  const filterSpeedLimit = getFilterFromQuery(queryObject, 'sp', 'speed_limit_hebrew', mapSpeedLimit);
+  const filterRoadWidth = getFilterFromQuery(queryObject, 'rw', 'road_width_hebrew', mapRoadWidth);
+  const filterMultiLane = getFilterFromQuery(queryObject, 'ml', 'multi_lane_hebrew', mapMultiLane);
+  const filterOneLane = getFilterFromQuery(queryObject, 'ol', 'one_lane_hebrew', mapOneLane);
 
   // return filterSev;
   const arrAnd = [
@@ -84,6 +101,11 @@ module.exports = function getFilter(queryObject) {
   if (filterDayNight) arrAnd.push(filterDayNight);
   if (filterMonth) arrAnd.push(filterMonth);
   if (filterVehicle) arrAnd.push(filterVehicle);
+  if (filterRoadType) arrAnd.push(filterRoadType);
+  if (filterSpeedLimit) arrAnd.push(filterSpeedLimit);
+  if (filterRoadWidth) arrAnd.push(filterRoadWidth);
+  if (filterMultiLane) arrAnd.push(filterMultiLane);
+  if (filterOneLane) arrAnd.push(filterOneLane);
   const filter = { $and: arrAnd };
   return filter;
 };
