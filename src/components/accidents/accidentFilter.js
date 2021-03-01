@@ -28,29 +28,56 @@ const jsonToMap = (filterName) => {
   return new Map(objFilter);
 };
 // List of Maps, each Map is one cloumn in db
-const mapInjTypes = jsonToMap('InjType');
+// const mapInjSevirty = jsonToMap('injury_severity');
+const mapInjTypes = jsonToMap('injured_type');
+const mapSex = jsonToMap('sex');
+const mapAge = jsonToMap('age_group');
+const mapPopType = jsonToMap('population_type');
+const mapDayNight = jsonToMap('day_night');
 
-function getFilterInjTypes({ injt }) {
-  const injTypeArr = JSON.parse(`[${injt}]`);
-  if (injTypeArr && injTypeArr.length > 0) {
-    const arr = injTypeArr.map((x) => ({ injured_type_hebrew: mapInjTypes.get(x) }));
-    const filter = { $or: arr };
-    return filter;
+function getFilterFromQuery(queryObject, qName, colName, mapFilterValues) {
+  const queryPart = queryObject[qName];
+  if (queryPart) {
+    const queryValsArr = JSON.parse(`[${queryPart}]`);
+    if (queryValsArr && queryValsArr.length > 0) {
+      const arr = queryValsArr.map((x) => ({ [colName]: mapFilterValues.get(x) }));
+      const filter = { $or: arr };
+      return filter;
+    }
   }
   return null;
 }
+
+// function getFilterInjTypes({ injt }) {
+//   const injTypeArr = JSON.parse(`[${injt}]`);
+//   if (injTypeArr && injTypeArr.length > 0) {
+//     const arr = injTypeArr.map((x) => ({ injured_type_hebrew: mapInjTypes.get(x) }));
+//     const filter = { $or: arr };
+//     return filter;
+//   }
+//   return null;
+// }
 
 module.exports = function getFilter(queryObject) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterSev(queryObject);
-  const filterInjType = getFilterInjTypes(queryObject);
+  const filterInjType = getFilterFromQuery(queryObject, 'injt', 'injured_type_hebrew', mapInjTypes);
+  const filterSex = getFilterFromQuery(queryObject, 'sex', 'sex_hebrew', mapSex);
+  const filterAge = getFilterFromQuery(queryObject, 'age', 'age_group_hebrew', mapAge);
+  const filterPopType = getFilterFromQuery(queryObject, 'pt', 'population_type_hebrew', mapPopType);
+  const filterDayNight = getFilterFromQuery(queryObject, 'dn', 'day_night_hebrew', mapDayNight);
+
   // return filterSev;
   const arrAnd = [
     filterYear,
     filterSev,
   ];
   if (filterInjType) arrAnd.push(filterInjType);
+  if (filterAge) arrAnd.push(filterAge);
+  if (filterSex) arrAnd.push(filterSex);
+  if (filterPopType) arrAnd.push(filterPopType);
+  if (filterDayNight) arrAnd.push(filterDayNight);
   const filter = { $and: arrAnd };
   return filter;
 };
