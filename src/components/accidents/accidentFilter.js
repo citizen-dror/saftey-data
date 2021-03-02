@@ -6,12 +6,6 @@ const getFilterYear = ({ sy, ey }) => {
   const eYear = (ey) ? parseInt(ey, 10) : 2019;
   return { accident_year: { $gte: sYear, $lte: eYear } };
 };
-const getFilterSev = ({ sev }) => {
-  const sevInj = (sev) || 'הרוג';
-  // ('dead', true, ['הרוג']));
-  // ('severly-injured', false, ['פצוע קשה']));
-  return { injury_severity_hebrew: sevInj };
-};
 
 const jsonFilters = fs.readFileSync(`${path.join(__dirname, 'filterCols.json')}`);
 /**
@@ -28,7 +22,7 @@ const jsonToMap = (filterName) => {
   return new Map(objFilter);
 };
 // List of Maps, each Map is one cloumn in db
-// const mapInjSevirty = jsonToMap('injury_severity');
+const mapInjSevirty = jsonToMap('injury_severity');
 const mapInjTypes = jsonToMap('injured_type');
 const mapSex = jsonToMap('sex');
 const mapAge = jsonToMap('age_group');
@@ -75,14 +69,30 @@ function getFilterByQurey(queryObject, qName, colName) {
   return null;
 }
 
-
+function getFilter2FildsByQurey(queryObject, qName, colName1, colName2) {
+  const queryPart = queryObject[qName];
+  if (queryPart) {
+    const queryValsArr = JSON.parse(`[${queryPart}]`);
+    if (queryValsArr && queryValsArr.length > 0) {
+      const arr1 = queryValsArr.map((x) => ({ [colName1]: x }));
+      const arr2 = queryValsArr.map((x) => ({ [colName2]: x }));
+      const arr = arr1.concat(arr2);
+      const filter = { $or: arr };
+      return filter;
+    }
+  }
+  return null;
+}
 
 module.exports = function getFilter(queryObject) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
-  const filterSev = getFilterSev(queryObject);
+  const filterSev = getFilterByDictionary(queryObject, 'sev', 'injury_severity_hebrew', mapInjSevirty);
   const filterInjType = getFilterByDictionary(queryObject, 'injt', 'injured_type_hebrew', mapInjTypes);
-  const filterCity = getFilterByQurey(queryObject, 'city', 'accident_yishuv_name')
+  const filterCity = getFilterByQurey(queryObject, 'city', 'accident_yishuv_name');
+  const filterStreet = getFilter2FildsByQurey(queryObject, 'st', 'street1_hebrew', 'street2_hebrew');
+  const filterRoadNum = getFilter2FildsByQurey(queryObject, 'rd', 'road1', 'road2');
+  const filterRoadSeg = getFilter2FildsByQurey(queryObject, 'rds', 'road_segment_name');
   const filterSex = getFilterByDictionary(queryObject, 'sex', 'sex_hebrew', mapSex);
   const filterAge = getFilterByDictionary(queryObject, 'age', 'age_group_hebrew', mapAge);
   const filterPopType = getFilterByDictionary(queryObject, 'pt', 'population_type_hebrew', mapPopType);
@@ -103,6 +113,9 @@ module.exports = function getFilter(queryObject) {
   ];
   if (filterInjType) arrAnd.push(filterInjType);
   if (filterCity) arrAnd.push(filterCity);
+  if (filterStreet) arrAnd.push(filterStreet);
+  if (filterRoadNum) arrAnd.push(filterRoadNum);
+  if (filterRoadSeg) arrAnd.push(filterRoadSeg);
   if (filterAge) arrAnd.push(filterAge);
   if (filterSex) arrAnd.push(filterSex);
   if (filterPopType) arrAnd.push(filterPopType);
