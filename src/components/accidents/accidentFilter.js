@@ -84,6 +84,30 @@ function getFilter2FildsByQurey(queryObject, qName, colName1, colName2) {
   return null;
 }
 
+// filter accidents using aggrgation pipline
+function getAggFilter(queryObject, filteAcc) {
+  const { p1, p2 } = queryObject;
+  if (p1 && p2) {
+    const pMin = parseInt(p1, 10);
+    const pMax = parseInt(p2, 10);
+    if (pMin > 0 && pMax > pMin) {
+      const filter = [
+        { $match: filteAcc },
+        {
+          $lookup: {
+            from: 'cities',
+            localField: 'accident_yishuv_name',
+            foreignField: 'name_he',
+            as: 'city',
+          },
+        },
+        { $match: { 'city.population': { $gte: pMin, $lte: pMax } } },
+      ];
+      return { fType: 'agg', filter };
+    } return { fType: 'find', filter: filteAcc };
+  } return { fType: 'find', filter: filteAcc };
+}
+
 module.exports = function getFilter(queryObject) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
@@ -128,6 +152,7 @@ module.exports = function getFilter(queryObject) {
   if (filterRoadWidth) arrAnd.push(filterRoadWidth);
   if (filterMultiLane) arrAnd.push(filterMultiLane);
   if (filterOneLane) arrAnd.push(filterOneLane);
-  const filter = { $and: arrAnd };
-  return filter;
+  const accfilter = { $and: arrAnd };
+  const filterObj = getAggFilter(queryObject, accfilter);
+  return filterObj;
 };
