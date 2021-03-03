@@ -3,7 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const logger = require('./middlewares/logger');
+const logger = require('./src/middlewares/logger');
 require('dotenv').config();
 
 const app = express();
@@ -42,13 +42,13 @@ app.use('/api/v1/accident/aggmain', limitMainFilter);
 app.use(limitAll);
 
 // eslint-disable-next-line no-unused-vars
-const db = require('./database');
-const usersRoute = require('./routes/users');
-const hazardRoue = require('./routes/hazards');
+const db = require('./src/database');
+const usersRoute = require('./src/routes/users');
+const hazardRoue = require('./src/routes/hazards');
 // const accidentRoute = require('./src/routes/accident');
-const accidentRoute = require('./components/accidents/accidentAPI');
-const cityRoute = require('./routes/city');
-const imgRoute = require('./routes/images');
+const accidentRoute = require('./src/components/accidents/accidentAPI');
+const cityRoute = require('./src/routes/city');
+const imgRoute = require('./src/routes/images');
 
 app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(bodyParser.json());
