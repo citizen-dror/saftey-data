@@ -85,7 +85,7 @@ function getFilter2FildsByQurey(queryObject, qName, colName1, colName2) {
 }
 
 // filter accidents using aggrgation pipline
-function getAggFilter(queryObject, filteAcc) {
+function getAggFilter(queryObject, filteAcc, useMatch) {
   const { p1, p2 } = queryObject;
   if (p1 && p2) {
     const pMin = parseInt(p1, 10);
@@ -105,10 +105,12 @@ function getAggFilter(queryObject, filteAcc) {
       ];
       return { fType: 'agg', filter };
     } return { fType: 'find', filter: filteAcc };
+  } if (useMatch) {
+    return { fType: 'agg', filter: { $match: filteAcc } };
   } return { fType: 'find', filter: filteAcc };
 }
 
-module.exports = function getFilter(queryObject) {
+function getFilter(queryObject, useMatch) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterByDictionary(queryObject, 'sev', 'injury_severity_hebrew', mapInjSevirty);
@@ -153,6 +155,38 @@ module.exports = function getFilter(queryObject) {
   if (filterMultiLane) arrAnd.push(filterMultiLane);
   if (filterOneLane) arrAnd.push(filterOneLane);
   const accfilter = { $and: arrAnd };
-  const filterObj = getAggFilter(queryObject, accfilter);
+  const filterObj = getAggFilter(queryObject, accfilter, useMatch);
   return filterObj;
-};
+}
+
+function getGroupBy(queryObject) {
+  const queryPart = queryObject.gb;
+  if (queryPart) {
+    return {
+      $group: {
+        _id: `$${queryPart}`,
+        count: {
+          $sum: 1,
+        },
+      },
+    };
+  } return null;
+}
+
+function getSort() {
+  return {
+    $sort: {
+      _id: 1,
+    },
+  };
+}
+
+function getFilterGroupBy(queryObject) {
+  const filterObj = getFilter(queryObject, true);
+  const { filter } = filterObj;
+  const groupBy = getGroupBy(queryObject);
+  const sort = getSort();
+  return [filter, groupBy, sort];
+}
+
+module.exports = { getFilter, getFilterGroupBy };

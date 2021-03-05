@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/count', controller.accident_count);
 
 // filter+ group accidents by query body
-router.post('/agg', controller.accident_getGroupBy);
+router.post('/agg', controller.accident_GroupBy_post);
 
 // get list of accidets aggregate a filter by query body, return deteail projection
 router.post('/aggmain', (req, res) => {
@@ -26,6 +26,12 @@ router.post('/agglatlon', (req, res) => {
 router.get('/', (req, res) => {
   const queryObject = url.parse(req.url, true).query;
   controller.accident_get(req, res, queryObject);
+});
+
+// filter+ group accidents by query
+router.get('/groupby/', (req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  controller.accident_getGroupBy(req, res, queryObject);
 });
 
 // // aggregate by filter by post
