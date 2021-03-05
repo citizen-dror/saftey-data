@@ -160,17 +160,26 @@ function getFilter(queryObject, useMatch) {
 }
 
 function getGroupBy(queryObject) {
+  let res = null;
   const queryPart = queryObject.gb;
   if (queryPart) {
-    return {
-      $group: {
-        _id: `$${queryPart}`,
-        count: {
-          $sum: 1,
+    const queryValsArr = queryPart.split(',');
+    if (queryValsArr && queryValsArr.length > 0) {
+      let id = `$${queryPart}`;
+      if (queryValsArr.length > 1) {
+        id = { col1: `$${queryValsArr[0]}`, col2: `$${queryValsArr[1]}` };
+      }
+      res = {
+        $group: {
+          _id: id,
+          count: {
+            $sum: 1,
+          },
         },
-      },
-    };
-  } return null;
+      };
+    }
+  }
+  return res;
 }
 
 function getSort() {
