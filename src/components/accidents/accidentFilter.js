@@ -37,6 +37,32 @@ const mapRoadWidth = jsonToMap('road_width');
 const mapMultiLane = jsonToMap('multi_lane');
 const mapOneLane = jsonToMap('one_lane');
 
+function getQueryDBnamesMap() {
+  const map = new Map();
+  map.set('year', 'accident_year');
+  map.set('sev', 'injury_severity_hebrew');
+  map.set('injt', 'injured_type_hebrew');
+  map.set('city', 'accident_yishuv_name');
+  map.set('st', 'street1_hebrew');
+  map.set('rd', 'road1');
+  map.set('rds', 'road_segment_name');
+  map.set('sex', 'sex_hebrew');
+  map.set('age', 'age_group_hebrew');
+  map.set('pt', 'population_type_hebrew');
+  map.set('dn', 'day_night_hebrew');
+  map.set('mn', 'accident_month');
+  map.set('acc', 'accident_type_hebrew');
+  map.set('vcl', 'vehicle_vehicle_type_hebrew');
+  map.set('rt', 'road_type_hebrew');
+  map.set('sp', 'speed_limit_hebrew');
+  map.set('rw', 'road_width_hebrew');
+  map.set('ml', 'multi_lane_hebrew');
+  map.set('ol', 'one_lane_hebrew');
+  return map;
+}
+
+const queryDBnamesMap = getQueryDBnamesMap();
+
 /**
  * create filter from query string sentence
  * @param {ParsedUrlQuery} queryObject - query objcet form the request
@@ -113,15 +139,15 @@ function getAggFilter(queryObject, filteAcc, useMatch) {
 function getFilter(queryObject, useMatch) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
-  const filterSev = getFilterByDictionary(queryObject, 'sev', 'injury_severity_hebrew', mapInjSevirty);
-  const filterInjType = getFilterByDictionary(queryObject, 'injt', 'injured_type_hebrew', mapInjTypes);
-  const filterCity = getFilterByQurey(queryObject, 'city', 'accident_yishuv_name');
+  const filterSev = getFilterByDictionary(queryObject, 'sev', queryDBnamesMap.get('sev'), mapInjSevirty);
+  const filterInjType = getFilterByDictionary(queryObject, 'injt', queryDBnamesMap.get('injt'), mapInjTypes);
+  const filterCity = getFilterByQurey(queryObject, 'city', queryDBnamesMap.get('city'));
   const filterStreet = getFilter2FildsByQurey(queryObject, 'st', 'street1_hebrew', 'street2_hebrew');
   const filterRoadNum = getFilter2FildsByQurey(queryObject, 'rd', 'road1', 'road2');
-  const filterRoadSeg = getFilter2FildsByQurey(queryObject, 'rds', 'road_segment_name');
-  const filterSex = getFilterByDictionary(queryObject, 'sex', 'sex_hebrew', mapSex);
-  const filterAge = getFilterByDictionary(queryObject, 'age', 'age_group_hebrew', mapAge);
-  const filterPopType = getFilterByDictionary(queryObject, 'pt', 'population_type_hebrew', mapPopType);
+  const filterRoadSeg = getFilter2FildsByQurey(queryObject, 'rds', queryDBnamesMap.get('rds'));
+  const filterSex = getFilterByDictionary(queryObject, 'sex', queryDBnamesMap.get('sex'), mapSex);
+  const filterAge = getFilterByDictionary(queryObject, 'age', queryDBnamesMap.get('age'), mapAge);
+  const filterPopType = getFilterByDictionary(queryObject, 'pt', queryDBnamesMap.get('pt'), mapPopType);
   const filterDayNight = getFilterByDictionary(queryObject, 'dn', 'day_night_hebrew', mapDayNight);
   const filterMonth = getFilterByDictionary(queryObject, 'mn', 'accident_month', mapMonth);
   const filtrtAccidentType = getFilterByDictionary(queryObject, 'acc', 'accident_type_hebrew', mapAccidentType);
@@ -165,9 +191,11 @@ function getGroupBy(queryObject) {
   if (queryPart) {
     const queryValsArr = queryPart.split(',');
     if (queryValsArr && queryValsArr.length > 0) {
-      let id = `$${queryPart}`;
+      let id = `$${queryDBnamesMap.get(queryPart)}`;
       if (queryValsArr.length > 1) {
-        id = { col1: `$${queryValsArr[0]}`, col2: `$${queryValsArr[1]}` };
+        const col1 = queryDBnamesMap.get(queryValsArr[0]);
+        const col2 = queryDBnamesMap.get(queryValsArr[1]);
+        id = { col1: `$${col1}`, col2: `$${col2}` };
       }
       res = {
         $group: {
