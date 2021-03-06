@@ -194,20 +194,26 @@ function getGroupBy(queryObject) {
   if (queryPart) {
     const queryValsArr = queryPart.split(',');
     if (queryValsArr && queryValsArr.length > 0) {
-      let id = `$${queryDBnamesMap.get(queryPart)}`;
       if (queryValsArr.length > 1) {
-        const col1 = queryDBnamesMap.get(queryValsArr[0]);
-        const col2 = queryDBnamesMap.get(queryValsArr[1]);
-        id = { col1: `$${col1}`, col2: `$${col2}` };
-      }
-      res = {
-        $group: {
-          _id: id,
-          count: {
-            $sum: 1,
+        const groupName1 = queryDBnamesMap.get(queryValsArr[0]);
+        const groupName2 = queryDBnamesMap.get(queryValsArr[1]);
+        const metch1 = JSON.parse(`{ "$match" : { "${groupName2}" : { "$exists" : true, "$ne" : null}}}`);
+        const grpids = `{ "grp1": "$${groupName1}", "grp2": "$${groupName2}"}`;
+        const group1 = JSON.parse(`{"$group": { "_id":${grpids}, "count": { "$sum": 1 }}}`);
+        const count = '{ "$push": {"grp2" : "$_id.grp2","count" : "$count" } }';
+        const group2 = JSON.parse(`{"$group": { "_id": "$_id.grp1" , "count": ${count}}}`);
+        res = [metch1, group1, group2];
+      } else {
+        const id = `$${queryDBnamesMap.get(queryPart)}`;
+        res = [{
+          $group: {
+            _id: id,
+            count: {
+              $sum: 1,
+            },
           },
-        },
-      };
+        }];
+      }
     }
   }
   return res;
@@ -226,7 +232,7 @@ function getFilterGroupBy(queryObject) {
   const { filter } = filterObj;
   const groupBy = getGroupBy(queryObject);
   const sort = getSort();
-  return [filter, groupBy, sort];
+  return [filter, ...groupBy, sort];
 }
 
 module.exports = { getFilter, getFilterGroupBy };
