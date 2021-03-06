@@ -51,8 +51,10 @@ function getQueryDBnamesMap() {
   map.set('pt', 'population_type_hebrew');
   map.set('dn', 'day_night_hebrew');
   map.set('mn', 'accident_month');
+  map.set('wd', 'day_in_week_hebrew');
   map.set('acc', 'accident_type_hebrew');
   map.set('vcl', 'vehicle_vehicle_type_hebrew');
+  map.set('vcli', 'vehicles');
   map.set('rt', 'road_type_hebrew');
   map.set('sp', 'speed_limit_hebrew');
   map.set('rw', 'road_width_hebrew');
@@ -161,8 +163,8 @@ function getFilter(queryObject, useMatch) {
   // return filterSev;
   const arrAnd = [
     filterYear,
-    filterSev,
   ];
+  if (filterSev) arrAnd.push(filterSev);
   if (filterInjType) arrAnd.push(filterInjType);
   if (filterCity) arrAnd.push(filterCity);
   if (filterStreet) arrAnd.push(filterStreet);
@@ -181,6 +183,7 @@ function getFilter(queryObject, useMatch) {
   if (filterMultiLane) arrAnd.push(filterMultiLane);
   if (filterOneLane) arrAnd.push(filterOneLane);
   const accfilter = { $and: arrAnd };
+  // console.log(JSON.stringify(accfilter));
   const filterObj = getAggFilter(queryObject, accfilter, useMatch);
   return filterObj;
 }
