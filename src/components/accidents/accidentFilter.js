@@ -111,16 +111,14 @@ function getFilter2FildsByQurey(queryObject, qName, colName1, colName2) {
   }
   return null;
 }
-
-// filter accidents using aggrgation pipline
-function getAggFilter(queryObject, filteAcc, useMatch) {
+function getFilterbyCityPop(queryObject) {
+  let filter = null;
   const { p1, p2 } = queryObject;
   if (p1 && p2) {
     const pMin = parseInt(p1, 10);
     const pMax = parseInt(p2, 10);
     if (pMin > 0 && pMax > pMin) {
-      const filter = [
-        { $match: filteAcc },
+      filter = [
         {
           $lookup: {
             from: 'cities',
@@ -131,11 +129,9 @@ function getAggFilter(queryObject, filteAcc, useMatch) {
         },
         { $match: { 'city.population': { $gte: pMin, $lte: pMax } } },
       ];
-      return { fType: 'agg', filter };
-    } return { fType: 'find', filter: filteAcc };
-  } if (useMatch) {
-    return { fType: 'agg', filter: { $match: filteAcc } };
-  } return { fType: 'find', filter: filteAcc };
+    }
+  }
+  return filter;
 }
 
 function getFilter(queryObject, useMatch) {
@@ -184,7 +180,15 @@ function getFilter(queryObject, useMatch) {
   if (filterOneLane) arrAnd.push(filterOneLane);
   const accfilter = { $and: arrAnd };
   // console.log(JSON.stringify(accfilter));
-  const filterObj = getAggFilter(queryObject, accfilter, useMatch);
+  const filterByPopArr = getFilterbyCityPop(queryObject);
+  let filterObj = null;
+  if (filterByPopArr) {
+    filterObj = { fType: 'agg', filter: [{ $match: accfilter }, ...filterByPopArr] };
+  } else if (useMatch) {
+    filterObj = { fType: 'agg', filter: [{ $match: accfilter }] };
+  } else {
+    filterObj = { fType: 'find', filter: accfilter };
+  }
   return filterObj;
 }
 
@@ -230,7 +234,7 @@ function getFilterGroupBy(queryObject) {
   const { filter } = filterObj;
   const groupBy = getGroupBy(queryObject);
   const sort = getSort();
-  return [filter, ...groupBy, sort];
+  return [...filter, ...groupBy, sort];
 }
 
 module.exports = { getFilter, getFilterGroupBy };
