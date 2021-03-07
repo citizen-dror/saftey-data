@@ -43,6 +43,7 @@ function getQueryDBnamesMap() {
   map.set('sev', 'injury_severity_hebrew');
   map.set('injt', 'injured_type_hebrew');
   map.set('city', 'accident_yishuv_name');
+  map.set('cpop', 'cpop');
   map.set('st', 'street1_hebrew');
   map.set('rd', 'road1');
   map.set('rds', 'road_segment_name');
@@ -192,6 +193,22 @@ function getFilter(queryObject, useMatch) {
   return filterObj;
 }
 
+function getGroupByCityPop(limit, sort) {
+  let filter = null;
+  const group1 = JSON.parse('{"$group": {'
+    + '"_id": "$accident_yishuv_name","t_count" : { "$sum" : 1 },"t_population" : { "$first" : "$city.population" }'
+    + '}}');
+  const unWind = JSON.parse('{ "$unwind" : "$t_population"}');
+  const project = JSON.parse('{ "$project" : { "count" :'
+    + '{ "$multiply" : [100000, { "$divide" : ["$t_count", "$t_population"] } ]}'
+    + '}}');
+  const sortF = JSON.parse(`{"$sort": {"count": ${sort}}}`);
+  const limitF = (limit === 0) ? null : { $limit: limit };
+  filter = [group1, unWind, project, sortF];
+  if (limitF) filter.push(limitF);
+  return filter;
+}
+
 function getGroupBy(queryObject) {
   let res = null;
   const queryPart = queryObject.gb;
@@ -232,6 +249,12 @@ function getSort() {
 function getFilterGroupBy(queryObject) {
   const filterObj = getFilter(queryObject, true);
   const { filter } = filterObj;
+  const queryPart = queryObject.gb;
+  const groupName1 = queryDBnamesMap.get(queryPart);
+  if (groupName1 === 'cpop') {
+    const groupBy = getGroupByCityPop(15, -1);
+    return [...filter, ...groupBy];
+  }
   const groupBy = getGroupBy(queryObject);
   const sort = getSort();
   return [...filter, ...groupBy, sort];

@@ -45,6 +45,7 @@ exports.accident_get_agg_list_DAL = (agg, type) => {
 };
 
 exports.accident_getGroupBy_DAL = (agg) => AccidentMoedel2.aggregate(agg);
+// console.log(JSON.stringify(agg));
 
 exports.accident_get_find_list_DAL = (find, type) => {
   const proj = getProjByType(type);
