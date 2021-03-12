@@ -37,6 +37,7 @@ exports.accident_get = (req, res, queryObject) => {
 exports.accident_getGroupBy = (req, res, queryObject) => {
   // console.log(queryObject);
   const filterGroupBy = getFilterGroupBy(queryObject);
+  // console.log(JSON.stringify(filterGroupBy));
   accidentDAL.accident_getGroupBy_DAL(filterGroupBy)
     .then((doc) => res.jsonp(doc));
 };

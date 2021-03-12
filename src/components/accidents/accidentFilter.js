@@ -112,30 +112,34 @@ function getFilter2FildsByQurey(queryObject, qName, colName1, colName2) {
   }
   return null;
 }
-function getFilterbyCityPop(queryObject) {
+function getFilterbyCityPop(queryObject, addLookup) {
   let filter = null;
+  const lookup = {
+    $lookup: {
+      from: 'cities',
+      localField: 'accident_yishuv_name',
+      foreignField: 'name_he',
+      as: 'city',
+    },
+  };
   const { p1, p2 } = queryObject;
   if (p1 && p2) {
     const pMin = parseInt(p1, 10);
     const pMax = parseInt(p2, 10);
     if (pMin > 0 && pMax > pMin) {
       filter = [
-        {
-          $lookup: {
-            from: 'cities',
-            localField: 'accident_yishuv_name',
-            foreignField: 'name_he',
-            as: 'city',
-          },
-        },
+        lookup,
         { $match: { 'city.population': { $gte: pMin, $lte: pMax } } },
       ];
     }
+  } else if (addLookup) {
+    filter = [lookup];
   }
+
   return filter;
 }
 
-function getFilter(queryObject, useMatch) {
+function getFilter(queryObject, useMatch, addCityLookup) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterByDictionary(queryObject, 'sev', queryDBnamesMap.get('sev'), mapInjSevirty);
@@ -181,7 +185,7 @@ function getFilter(queryObject, useMatch) {
   if (filterOneLane) arrAnd.push(filterOneLane);
   const accfilter = { $and: arrAnd };
   // console.log(JSON.stringify(accfilter));
-  const filterByPopArr = getFilterbyCityPop(queryObject);
+  const filterByPopArr = getFilterbyCityPop(queryObject, addCityLookup);
   let filterObj = null;
   if (filterByPopArr) {
     filterObj = { fType: 'agg', filter: [{ $match: accfilter }, ...filterByPopArr] };
@@ -247,11 +251,12 @@ function getSort() {
 }
 
 function getFilterGroupBy(queryObject) {
-  const filterObj = getFilter(queryObject, true);
-  const { filter } = filterObj;
   const queryPart = queryObject.gb;
   const groupName1 = queryDBnamesMap.get(queryPart);
-  if (groupName1 === 'cpop') {
+  const groupByCityPop = (groupName1 === 'cpop');
+  const filterObj = getFilter(queryObject, true, groupByCityPop);
+  const { filter } = filterObj;
+  if (groupByCityPop) {
     const groupBy = getGroupByCityPop(15, -1);
     return [...filter, ...groupBy];
   }
