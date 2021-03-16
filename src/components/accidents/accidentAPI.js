@@ -1,5 +1,5 @@
 const express = require('express');
-const url = require('url');
+// const url = require('url');
 const controller = require('./accidentController');
 // const cache = require('../../middlewares/cache');
 
@@ -7,31 +7,45 @@ const router = express.Router();
 // const isUseCache = false;
 
 // count accidents by query body
-router.post('/count', controller.accident_count);
+router.post('/count', async (req, res) => {
+  const query = req.body;
+  const doc = await controller.accident_count(query);
+  return res.json(doc);
+});
 
 // filter+ group accidents by query body
-router.post('/agg', controller.accident_GroupBy_post);
+router.post('/agg', async (req, res) => {
+  const query = req.body;
+  const doc = await controller.accident_GroupBy_post(query);
+  return res.json(doc);
+});
 
 // get list of accidets aggregate a filter by query body, return deteail projection
-router.post('/aggmain', (req, res) => {
-  controller.accident_getList(req, res, 'main');
+router.post('/aggmain', async (req, res) => {
+  const query = req.body;
+  const doc = await controller.accident_getList(query, 'main');
+  return res.json(doc);
 });
 
 // get list of accidets aggregate a filter by query body, return lat-lon projection
-router.post('/agglatlon', (req, res) => {
-  controller.accident_getList(req, res, 'latlon');
+router.post('/agglatlon', async (req, res) => {
+  const query = req.body;
+  const doc = await controller.accident_getList(query, 'latlon');
+  return res.json(doc);
 });
 
 // get list of accidets aggregate a filter by query body, return deteail projection
-router.get('/', (req, res) => {
-  const queryObject = url.parse(req.url, true).query;
-  controller.accident_get(req, res, queryObject);
+router.get('/', async (req, res) => {
+  const queryObject = req.query;
+  const doc = await controller.accident_get(queryObject);
+  return res.json(doc);
 });
 
 // filter+ group accidents by query
-router.get('/groupby/', (req, res) => {
-  const queryObject = url.parse(req.url, true).query;
-  controller.accident_getGroupBy(req, res, queryObject);
+router.get('/groupby/', async (req, res) => {
+  const queryObject = req.query;
+  const doc = await controller.accident_getGroupBy(queryObject);
+  return res.json(doc);
 });
 
 // // aggregate by filter by post
