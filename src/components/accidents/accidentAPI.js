@@ -1,6 +1,6 @@
 const express = require('express');
 // const url = require('url');
-const controller = require('./accidentController');
+const service = require('./accidentService');
 // const cache = require('../../middlewares/cache');
 
 const router = express.Router();
@@ -9,42 +9,42 @@ const router = express.Router();
 // count accidents by query body
 router.post('/count', async (req, res) => {
   const query = req.body;
-  const doc = await controller.accident_count(query);
+  const doc = await service.accident_count(query);
   return res.json(doc);
 });
 
 // filter+ group accidents by query body
 router.post('/agg', async (req, res) => {
   const query = req.body;
-  const doc = await controller.accident_GroupBy_post(query);
+  const doc = await service.accident_GroupBy_post(query);
   return res.json(doc);
 });
 
 // get list of accidets aggregate a filter by query body, return deteail projection
 router.post('/aggmain', async (req, res) => {
   const query = req.body;
-  const doc = await controller.accident_getList(query, 'main');
+  const doc = await service.accident_getList(query, 'main');
   return res.json(doc);
 });
 
 // get list of accidets aggregate a filter by query body, return lat-lon projection
 router.post('/agglatlon', async (req, res) => {
   const query = req.body;
-  const doc = await controller.accident_getList(query, 'latlon');
+  const doc = await service.accident_getList(query, 'latlon');
   return res.json(doc);
 });
 
 // get list of accidets aggregate a filter by query body, return deteail projection
 router.get('/', async (req, res) => {
   const queryObject = req.query;
-  const doc = await controller.accident_get(queryObject);
+  const doc = await service.accident_get(queryObject);
   return res.json(doc);
 });
 
 // filter+ group accidents by query
 router.get('/groupby/', async (req, res) => {
   const queryObject = req.query;
-  const doc = await controller.accident_getGroupBy(queryObject);
+  const doc = await service.accident_getGroupBy(queryObject);
   return res.json(doc);
 });
 
