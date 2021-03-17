@@ -41,6 +41,13 @@ router.get('/', async (req, res) => {
   return res.json(doc);
 });
 
+// count accidents by query query
+router.get('/count/', async (req, res) => {
+  const queryObject = req.query;
+  const doc = await service.accident_count_get(queryObject);
+  return res.json(doc);
+});
+
 // filter+ group accidents by query
 router.get('/groupby/', async (req, res) => {
   const queryObject = req.query;

@@ -34,6 +34,15 @@ exports.accident_get = async (queryObject) => {
   return res;
 };
 
+exports.accident_count_get = async (queryObject) => {
+  // console.log(queryObject);
+  const filterObj = getFilter(queryObject, false);
+  // console.log(filterObj);
+  const { filter } = filterObj;
+  const res = await accidentDAL.accident_count_DAL(filter, 'main');
+  return res;
+};
+
 exports.accident_getGroupBy = async (queryObject) => {
   // console.log(queryObject);
   const filterGroupBy = getFilterGroupBy(queryObject);
