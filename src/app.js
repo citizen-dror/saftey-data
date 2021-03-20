@@ -5,6 +5,7 @@ require('dotenv').config();
 
 // Get port from environment and store in Express.
 const port = process.env.PORT || 5000;
+
 async function startServer() {
   const app = express();
 
