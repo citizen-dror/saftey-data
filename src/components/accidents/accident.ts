@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const AccidentSchema = mongoose.Schema({
+const AccidentSchema = new mongoose.Schema({
   _id: String,
   accident_year: Number,
   accident_timestamp: String,
