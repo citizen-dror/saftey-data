@@ -1,6 +1,6 @@
-const AccidentMoedel2 = require('./accidet');
+const AccidentMoedel2 = require('./accident');
 
-const getProjByType = (type) => {
+const getProjByType = (type: string) => {
   let proj = {};
   if (type === 'main') {
     proj = {
@@ -36,18 +36,18 @@ const getProjByType = (type) => {
   return proj;
 };
 
-exports.accident_count_DAL = (filter) => AccidentMoedel2.countDocuments(filter);
+exports.accident_count_DAL = (filter: any) => AccidentMoedel2.countDocuments(filter);
 
-exports.accident_get_agg_list_DAL = (agg, type) => {
+exports.accident_get_agg_list_DAL = (agg: any, type: string) => {
   const proj = { $project: getProjByType(type) };
   agg.push(proj);
   return AccidentMoedel2.aggregate(agg);
 };
 
-exports.accident_getGroupBy_DAL = (agg) => AccidentMoedel2.aggregate(agg);
+exports.accident_getGroupBy_DAL = (agg: any) => AccidentMoedel2.aggregate(agg);
 // console.log(JSON.stringify(agg));
 
-exports.accident_get_find_list_DAL = (find, type) => {
+exports.accident_get_find_list_DAL = (find: any, type: string) => {
   const proj = getProjByType(type);
   return AccidentMoedel2.find(find, proj);
 };

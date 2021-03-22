@@ -17,7 +17,7 @@ const FILTER_ARR = JSON.parse(jsonFilters);
  * create Map form array of pairs. the key is the query-string value, value is the db value.
  * @param {string} filterName
  */
-const jsonToMap = (filterName) => {
+const jsonToMap = (filterName: string) => {
   const objFilter = FILTER_ARR[filterName];
   return new Map(objFilter);
 };
@@ -73,24 +73,24 @@ const queryDBnamesMap = getQueryDBnamesMap();
  * @param {string} colName - column name in db.
  * @param {Map} mapFilterValues - Map of values in query (key) and db (value).
  */
-function getFilterByDictionary(queryObject, qName, colName, mapFilterValues) {
+function getFilterByDictionary(queryObject: any, qName: string, colName: string, mapFilterValues: Map<any,any>) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
     if (queryValsArr && queryValsArr.length > 0) {
-      const arr = queryValsArr.map((x) => ({ [colName]: mapFilterValues.get(x) }));
+      const arr = queryValsArr.map((x:any) => ({ [colName]: mapFilterValues.get(x) }));
       const filter = { $or: arr };
       return filter;
     }
   }
   return null;
 }
-function getFilterByQurey(queryObject, qName, colName) {
+function getFilterByQurey(queryObject: any, qName: string, colName: string) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
     if (queryValsArr && queryValsArr.length > 0) {
-      const arr = queryValsArr.map((x) => ({ [colName]: x }));
+      const arr = queryValsArr.map((x:any) => ({ [colName]: x }));
       const filter = { $or: arr };
       return filter;
     }
@@ -98,7 +98,7 @@ function getFilterByQurey(queryObject, qName, colName) {
   return null;
 }
 
-function getFilter2FildsByQurey(queryObject, qName, colName1, colName2) {
+function getFilter2FildsByQurey(queryObject: any, qName: string, colName1: string, colName2: string) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
@@ -112,7 +112,7 @@ function getFilter2FildsByQurey(queryObject, qName, colName1, colName2) {
   }
   return null;
 }
-function getFilterbyCityPop(queryObject, addLookup) {
+function getFilterbyCityPop(queryObject: any, addLookup: boolean) {
   let filter = null;
   const lookup = {
     $lookup: {
@@ -139,7 +139,7 @@ function getFilterbyCityPop(queryObject, addLookup) {
   return filter;
 }
 
-function getFilter(queryObject, useMatch, addCityLookup) {
+function getFilter(queryObject: any, useMatch: boolean, addCityLookup: boolean) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterByDictionary(queryObject, 'sev', queryDBnamesMap.get('sev'), mapInjSevirty);
@@ -147,7 +147,7 @@ function getFilter(queryObject, useMatch, addCityLookup) {
   const filterCity = getFilterByQurey(queryObject, 'city', queryDBnamesMap.get('city'));
   const filterStreet = getFilter2FildsByQurey(queryObject, 'st', 'street1_hebrew', 'street2_hebrew');
   const filterRoadNum = getFilter2FildsByQurey(queryObject, 'rd', 'road1', 'road2');
-  const filterRoadSeg = getFilter2FildsByQurey(queryObject, 'rds', queryDBnamesMap.get('rds'));
+  const filterRoadSeg = getFilterByQurey(queryObject, 'rds', queryDBnamesMap.get('rds'));
   const filterSex = getFilterByDictionary(queryObject, 'sex', queryDBnamesMap.get('sex'), mapSex);
   const filterAge = getFilterByDictionary(queryObject, 'age', queryDBnamesMap.get('age'), mapAge);
   const filterPopType = getFilterByDictionary(queryObject, 'pt', queryDBnamesMap.get('pt'), mapPopType);
@@ -162,7 +162,7 @@ function getFilter(queryObject, useMatch, addCityLookup) {
   const filterOneLane = getFilterByDictionary(queryObject, 'ol', 'one_lane_hebrew', mapOneLane);
 
   // return filterSev;
-  const arrAnd = [
+  const arrAnd : any[] = [
     filterYear,
   ];
   if (filterSev) arrAnd.push(filterSev);
@@ -197,7 +197,7 @@ function getFilter(queryObject, useMatch, addCityLookup) {
   return filterObj;
 }
 
-function getGroupByCityPop(limit, sort) {
+function getGroupByCityPop(limit:any, sort: any) {
   let filter = null;
   const group1 = JSON.parse('{"$group": {'
     + '"_id": "$accident_yishuv_name","t_count" : { "$sum" : 1 },"t_population" : { "$first" : "$city.population" }'
@@ -213,7 +213,7 @@ function getGroupByCityPop(limit, sort) {
   return filter;
 }
 
-function getGroupBy(queryObject) {
+function getGroupBy(queryObject: any) {
   let res = null;
   const queryPart = queryObject.gb;
   if (queryPart) {
@@ -250,7 +250,7 @@ function getSort() {
   };
 }
 
-function getFilterGroupBy(queryObject) {
+function getFilterGroupBy(queryObject: any) {
   const queryPart = queryObject.gb;
   const groupName1 = queryDBnamesMap.get(queryPart);
   const groupByCityPop = (groupName1 === 'cpop');

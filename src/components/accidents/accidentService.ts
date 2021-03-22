@@ -1,5 +1,5 @@
 const accidentDAL = require('./accidentDAL');
-const { getFilter, getFilterGroupBy } = require('./accidentFilter');
+const accFilter = require('./accidentFilter');
 // const logger = require('../../middlewares/logger');
 
 // count all accidens by filter
@@ -22,7 +22,7 @@ exports.accident_GroupBy_post = async (query) => {
 
 exports.accident_get = async (queryObject) => {
   // console.log(queryObject);
-  const filterObj = getFilter(queryObject, false);
+  const filterObj = accFilter.getFilter(queryObject, false);
   // console.log(filterObj);
   const { fType, filter } = filterObj;
   let res = null;
@@ -36,7 +36,7 @@ exports.accident_get = async (queryObject) => {
 
 exports.accident_count_get = async (queryObject) => {
   // console.log(queryObject);
-  const filterObj = getFilter(queryObject, false);
+  const filterObj = accFilter.getFilter(queryObject, false);
   // console.log(filterObj);
   const { filter } = filterObj;
   const res = await accidentDAL.accident_count_DAL(filter, 'main');
@@ -45,7 +45,7 @@ exports.accident_count_get = async (queryObject) => {
 
 exports.accident_getGroupBy = async (queryObject) => {
   // console.log(queryObject);
-  const filterGroupBy = getFilterGroupBy(queryObject);
+  const filterGroupBy = accFilter.getFilterGroupBy(queryObject);
   // console.log(JSON.stringify(filterGroupBy));
   const res = await accidentDAL.accident_getGroupBy_DAL(filterGroupBy);
   return res;
