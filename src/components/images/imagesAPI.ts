@@ -129,22 +129,27 @@ const imageRoute = (app: Router) => {
   
   router.get('/:filename', async (req, res) => {
     const filePath = path.join(__dirname, '/../../../uploads',`${req.params.filename}`);
+    console.log("get image ", filePath);
     let foundFile = true;
     await fs.access(filePath, async (err) => {
-      console.log("2");
       if (err) {
         foundFile = false;
         await fetchImageFromDb(req.params.filename)
           .then(((status) => {
-            console.log("3");
+            console.log("after fetchImageFromDb");
             if (status === 200) {
+              console.log("status 200");
               return res.sendFile(filePath);
             } if (status === 404) {
-              console.log("4");
+              console.log("No file exists");
               return res.status(status).json({
                 err: 'No file exists',
               });
-            } return res.status(500).json('eror on image fetch');
+            } 
+            {
+              console.log("No image file exists",status );
+              return res.status(500).json('eror on image fetch');
+            }
           }));
         // file exists
       }
