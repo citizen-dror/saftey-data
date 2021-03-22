@@ -32,10 +32,11 @@ const imageRoute = (app: Router) => {
         return (404);
       }
       // logger.log(file.filename);
-      const fileName = `../uploads/${file.filename}`;
-      fs.writeFileSync(fileName, file.data);
+      const filePath = path.join(__dirname, '/../../../uploads',`${file.filename}`);
+      fs.writeFileSync(filePath, file.data);
       return (200);
     } catch (err) {
+      console.log ('fetchImageFromDb', err)
       return 500;
     }
   };
