@@ -1,41 +1,34 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
+import express, { Request, Response } from 'express';
+import path from 'path';
+// import bodyParser from 'body-parser';
 
 // import * as cors from 'cors';
-const logger = require('../middlewares/logger');
-const usersRoute = require('../routes/users');
-const hazardRoue = require('../routes/hazards');
-const accidentRoute = require('../components/accidents/accidentAPI');
-const cityRoute = require('../routes/city');
-const imgRoute = require('../routes/images');
+import imageRoute from '../components/images/imagesAPI';
+import accidentRoute from '../components/accidents/accidentAPI';
+import logger from '../middlewares/logger';
 
 const expressLoader = async ({ app }) => {
-  app.use(express.static(path.join(__dirname, 'uploads')));
-  app.use(bodyParser.json());
-  app.use((req, res, next) => {
+
+  app.use((req: Request, res: Response, next: any) => {
     logger.info(`${new Date().toString()} => ${req.originalUrl}:`, req.body);
     next();
   });
-  // get react static files
-  app.use(express.static(path.join(__dirname, 'build')));
-  app.use('/api/v1/users', usersRoute);
-  app.use('/api/v1/hazards', hazardRoue);
-  app.use('/api/v1/accident', accidentRoute);
-  app.use('/api/v1/city', cityRoute);
-  app.use('/api/v1/img', imgRoute);
+
+  accidentRoute(app);
+  imageRoute(app);
+
   // if not find - navigate in react
   app.use(express.static(path.join(__dirname, '../../build')));
   app.use(express.static(path.join(__dirname, '../../build/static')));
-  app.get('/*', (req, res) => {
+  app.get('/*', (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../../build', 'index.html'));
   });
 
-  app.use((req, res) => {
+  app.use((req: Request, res: Response) => {
     logger.info(`404 - ${req.originalUrl}`, req.body);
     res.status(404).send('The url you requested cannot be found.');
   });
-  app.use((error, req, res, next) => {
+  app.use((error: any, req: Request, res: Response, next: any) => {
     if (res.headersSent) {
       return next(error);
     }
@@ -48,4 +41,4 @@ const expressLoader = async ({ app }) => {
   return app;
 };
 
-module.exports = expressLoader;
+export default expressLoader;

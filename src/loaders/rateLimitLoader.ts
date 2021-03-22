@@ -1,4 +1,4 @@
-const rateLimit = require('express-rate-limit');
+import rateLimit from 'express-rate-limit';
 
 const limitMainFilter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
@@ -18,4 +18,4 @@ const rateLimitLoader = async ({ app }) => {
   return app;
 };
 
-module.exports = rateLimitLoader;
+export default rateLimitLoader;

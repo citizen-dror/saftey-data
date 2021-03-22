@@ -1,4 +1,4 @@
-const helmet = require('helmet');
+import helmet from 'helmet';
 
 const helmetLoder = async ({ app }) => {
   app.use(
@@ -22,4 +22,4 @@ const helmetLoder = async ({ app }) => {
   // app.use(helmet());
 };
 
-module.exports = helmetLoder;
+export default helmetLoder;

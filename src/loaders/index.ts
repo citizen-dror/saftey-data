@@ -1,8 +1,8 @@
-const expressLoader = require('./expressLoader');
-const rateLimitLoader = require('./rateLimitLoader');
-const helmetLoader = require('./helmetLoader');
+import expressLoader from './expressLoader';
+import rateLimitLoader from './rateLimitLoader';
+import helmetLoader from './helmetLoader';
 // import mongooseLoader from './mongoose';
-const logger = require('../middlewares/logger');
+import logger from '../middlewares/logger';
 
 const loader = async ({ expressApp }) => {
   await helmetLoader({ app: expressApp });
@@ -13,7 +13,7 @@ const loader = async ({ expressApp }) => {
 
   // const mongoConnection = await mongooseLoader();
   // eslint-disable-next-line no-unused-vars
-  const db = require('../database');
+  const db = require('../database1');
   logger.info('MongoDB Initialized');
 
   await expressLoader({ app: expressApp });
@@ -22,4 +22,4 @@ const loader = async ({ expressApp }) => {
   // ... more loaders can be here
 };
 
-module.exports = loader;
+export default loader;
