@@ -1,30 +1,55 @@
-import { createLogger, transports, format } from 'winston';
 
-const logger = createLogger({
-  level: 'info',
-  format: format.combine(
-    format.json(),
-    format.timestamp(),
-  ),
-  defaultMeta: { service: 'user-service' },
-  transports: [
-    //
-    // - Write all logs with level `error` and below to `error.log`
-    // - Write all logs with level `info` and below to `combined.log`
-    //
-    new transports.File({ filename: 'error.log', level: 'error' }),
-    new transports.File({ filename: 'combined.log' }),
-  ],
-});
+import winston from 'winston'
 
-//
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-//
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new transports.Console({
-    format: format.simple(),
-  }));
+const levels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  http: 3,
+  debug: 4,
 }
 
-export default logger;
+// show level of log. if dev - show all (debug or up), if production show warn or error
+const level = () => {
+  const env = process.env.NODE_ENV || 'development'
+  const isDevelopment = env === 'development'
+  return isDevelopment ? 'debug' : 'warn'
+}
+
+const colors = {
+  error: 'red',
+  warn: 'yellow',
+  info: 'green',
+  http: 'blue',
+  debug: 'white',
+}
+
+// link colors to severity levels
+winston.addColors(colors)
+
+const format = winston.format.combine(
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+  winston.format.printf(
+    (info) => `${info.timestamp} ${info.level}: ${info.message}`,
+  ),
+)
+
+const transports = [
+  new winston.transports.Console({
+    format: winston.format.colorize({ all: true }),
+  }),
+  new winston.transports.File({
+    filename: 'logs/error.log',
+    level: 'error',
+  }),
+  new winston.transports.File({ filename: 'logs/all.log' }),
+]
+
+const logger = winston.createLogger({
+  level: level(),
+  levels,
+  format,
+  transports,
+})
+
+export default logger

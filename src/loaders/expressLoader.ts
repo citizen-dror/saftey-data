@@ -10,12 +10,22 @@ import logger from '../middlewares/logger';
 const expressLoader = async ({ app }) => {
 
   app.use((req: Request, res: Response, next: any) => {
-    logger.info(`${new Date().toString()} => ${req.originalUrl}:`, req.body);
+    logger.info(`${req.originalUrl}:`, req.body);
     next();
   });
 
   accidentRoute(app);
   imageRoute(app);
+
+  app.get("/api/v1/logger", (_, res) => {
+    logger.error("This is an error log");
+    logger.warn("This is a warn log");
+    logger.info("This is a info log");
+    logger.http("This is a http log");
+    logger.debug("This is a debug log");
+  
+    res.send("Hello world");
+  });
 
   // if not find - navigate in react
   app.use(express.static(path.join(__dirname, '../../build')));
