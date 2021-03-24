@@ -2,7 +2,8 @@
 import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
-import imageModel, { IImage } from './images.model';
+import { IImage } from './images.model';
+import { image_get_file, image_get_list, image_count } from './imageDAL';
 import logger from '../../middlewares/logger';
 
 const storage = multer.diskStorage({
@@ -17,7 +18,7 @@ const upload = multer({ storage });
 
 const fetchImageFromDb = async (filename: string) => {
     try {
-        const file: IImage = await imageModel.ImageModel.findOne({ filename }).exec();
+        const file: IImage = await image_get_file(filename);
         if (!file) {
             return (404); // 'No file exists'
         }
@@ -49,7 +50,7 @@ const prepareImages = async (array: any[]) => {
 
 const countImages = async (query: any) => {
     try {
-        const count = await imageModel.ImageModel.countDocuments(query).exec();
+        const count = await image_count(query);
         return count;
     } catch (error) {
         return -1;
@@ -75,7 +76,7 @@ const getProjectionByLang = (lang: string) => {
 const get_image_by_tag = async (lang: string, tag: string) => {
     const projection = getProjectionByLang(lang);
     const cond = { tags: tag };
-    const doc = await imageModel.ImageModel.find(cond, projection).sort({ index: 1 });
+    const doc = await image_get_list(cond, projection);
     prepareImages(doc);
     return doc;
 }
@@ -83,7 +84,7 @@ const get_image_by_tag = async (lang: string, tag: string) => {
 const get_image_by_city = async (lang: string, city: string) => {
     const projection = getProjectionByLang(lang);
     const cond = { place: city };
-    const doc = await imageModel.ImageModel.find(cond, projection).sort({ index: 1 });
+    const doc = await image_get_list(cond, projection);
     prepareImages(doc);
     return doc;
 }
