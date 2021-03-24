@@ -5,14 +5,12 @@ import path from 'path';
 // import * as cors from 'cors';
 import imageRoute from '../components/images/imagesAPI';
 import accidentRoute from '../components/accidents/accidentAPI';
+import morganMiddleware from './morganLoader';
 import logger from '../middlewares/logger';
 
 const expressLoader = async ({ app }) => {
 
-  app.use((req: Request, res: Response, next: any) => {
-    logger.info(`${req.originalUrl}:`, req.body);
-    next();
-  });
+  app.use(morganMiddleware);
 
   accidentRoute(app);
   imageRoute(app);
