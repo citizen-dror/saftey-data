@@ -15,11 +15,17 @@ const skip = () => {
   return env !== "development";
 };
 
+// Define default message format string.
+// message format is made from tokens, that are defined in the Morgan lib.
+
+const loggerFormat = ':id :method :url :status :res[content-length] - :response-time ms';
+morgan.token('id', function getId(req) {
+  return (req as any).id
+});
+
 // Build morgan middleware
 const morganMiddleware = morgan(
-  // Define default message format string.
-  // message format is made from tokens, that are defined in the Morgan lib.
-  ":method :url :status :res[content-length] - :response-time ms",
+  loggerFormat,
   // Options: overwrote the stream and the skip logic.
   { stream, skip }
 );

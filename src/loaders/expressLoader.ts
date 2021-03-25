@@ -7,9 +7,11 @@ import imageRoute from '../components/images/imagesAPI';
 import accidentRoute from '../components/accidents/accidentAPI';
 import morganMiddleware from './morganLoader';
 import logger from '../middlewares/logger';
+const addRequestId = require('express-request-id')();
 
-const expressLoader = async ({ app }) => {
+function expressLoader({ app }) {
 
+  app.use(addRequestId);
   app.use(morganMiddleware);
 
   accidentRoute(app);
@@ -21,7 +23,7 @@ const expressLoader = async ({ app }) => {
     logger.info("This is a info log");
     logger.http("This is a http log");
     logger.debug("This is a debug log");
-  
+
     res.send("Hello world");
   });
 
@@ -44,9 +46,8 @@ const expressLoader = async ({ app }) => {
     return res.status(500).send('Unknown Error in the server');
   });
   // ...More middlewares
-
   // Return the express app
   return app;
-};
+}
 
 export default expressLoader;
