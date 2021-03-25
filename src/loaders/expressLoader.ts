@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 // import bodyParser from 'body-parser';
 
@@ -38,7 +38,7 @@ function expressLoader({ app }) {
     logger.info(`404 - ${req.originalUrl}`, req.body);
     res.status(404).send('The url you requested cannot be found.');
   });
-  app.use((error: any, req: Request, res: Response, next: any) => {
+  app.use((error: any, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) {
       return next(error);
     }

@@ -1,13 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import {AccidentQuery} from './AccidentQuery';
 
-const getFilterYear = ({ sy, ey }) => {
+const getFilterYear = (queryObject: AccidentQuery) => {
+  const { sy, ey } = queryObject;
   const sYear = (sy) ? parseInt(sy, 10) : 2015;
   const eYear = (ey) ? parseInt(ey, 10) : 2019;
   return { accident_year: { $gte: sYear, $lte: eYear } };
 };
 
-const jsonFilters = fs.readFileSync(`${path.join(__dirname, 'filterCols.json')}`);
+const jsonFilters = fs.readFileSync(`${path.join(__dirname, 'filterCols.json')}`, 'utf8');
 /**
  * array of filters columns. each filter name has array of pairs.
  * each pair is the query sting value and the db value.
@@ -68,12 +70,12 @@ const queryDBnamesMap = getQueryDBnamesMap();
 
 /**
  * create filter from query string sentence
- * @param {ParsedUrlQuery} queryObject - query objcet form the request
+ * @param {AccidentQuery} queryObject - query objcet form the request
  * @param {string} qName - query parmter name.
  * @param {string} colName - column name in db.
  * @param {Map} mapFilterValues - Map of values in query (key) and db (value).
  */
-function getFilterByDictionary(queryObject: any, qName: string, colName: string, mapFilterValues: Map<any,any>) {
+function getFilterByDictionary(queryObject: AccidentQuery, qName: string, colName: string, mapFilterValues: Map<any,any>) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
@@ -85,7 +87,7 @@ function getFilterByDictionary(queryObject: any, qName: string, colName: string,
   }
   return null;
 }
-function getFilterByQurey(queryObject: any, qName: string, colName: string) {
+function getFilterByQurey(queryObject: AccidentQuery, qName: string, colName: string) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
@@ -98,7 +100,7 @@ function getFilterByQurey(queryObject: any, qName: string, colName: string) {
   return null;
 }
 
-function getFilter2FildsByQurey(queryObject: any, qName: string, colName1: string, colName2: string) {
+function getFilter2FildsByQurey(queryObject: AccidentQuery, qName: string, colName1: string, colName2: string) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
@@ -112,7 +114,7 @@ function getFilter2FildsByQurey(queryObject: any, qName: string, colName1: strin
   }
   return null;
 }
-function getFilterbyCityPop(queryObject: any, addLookup: boolean) {
+function getFilterbyCityPop(queryObject: AccidentQuery, addLookup: boolean) {
   let filter = null;
   const lookup = {
     $lookup: {
@@ -139,7 +141,7 @@ function getFilterbyCityPop(queryObject: any, addLookup: boolean) {
   return filter;
 }
 
-function getFilter(queryObject: any, useMatch: boolean, addCityLookup: boolean) {
+function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup: boolean) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterByDictionary(queryObject, 'sev', queryDBnamesMap.get('sev'), mapInjSevirty);
@@ -250,7 +252,7 @@ function getSort() {
   };
 }
 
-function getFilterGroupBy(queryObject: any) {
+function getFilterGroupBy(queryObject: AccidentQuery) {
   const queryPart = queryObject.gb;
   const groupName1 = queryDBnamesMap.get(queryPart);
   const groupByCityPop = (groupName1 === 'cpop');
