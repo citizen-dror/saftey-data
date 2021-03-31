@@ -6,6 +6,7 @@ const getProjByType = (type: string) => {
     proj = {
       latitude: 1,
       longitude: 1,
+      location_accuracy_hebrew: 1,
       accident_timestamp: 1,
       day_in_week_hebrew: 1,
       day_night_hebrew: 1,

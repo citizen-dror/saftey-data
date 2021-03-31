@@ -39,6 +39,10 @@ const mapRoadWidth = jsonToMap('road_width');
 const mapMultiLane = jsonToMap('multi_lane');
 const mapOneLane = jsonToMap('one_lane');
 
+/**
+ * 
+ * @returns map of query names and the db column name 
+ */
 function getQueryDBnamesMap() {
   const map = new Map();
   map.set('year', 'accident_year');
@@ -47,6 +51,7 @@ function getQueryDBnamesMap() {
   map.set('city', 'accident_yishuv_name');
   map.set('cpop', 'cpop');
   map.set('st', 'street1_hebrew');
+  map.set('lca','location_accuracy_hebrew');
   map.set('rd', 'road1');
   map.set('rds', 'road_segment_name');
   map.set('sex', 'sex_hebrew');
