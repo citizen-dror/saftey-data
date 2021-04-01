@@ -33,6 +33,7 @@ const mapDayNight = jsonToMap('day_night');
 const mapMonth = jsonToMap('accident_month');
 const mapAccidentType = jsonToMap('accident_type');
 const mapVehicle = jsonToMap('vehicle_vehicle_type');
+const mapLocationAccuracy = jsonToMap('location_accuracy');
 const mapRoadType = jsonToMap('road_type');
 const mapSpeedLimit = jsonToMap('speed_limit');
 const mapRoadWidth = jsonToMap('road_width');
@@ -162,6 +163,7 @@ function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup:
   const filterMonth = getFilterByDictionary(queryObject, 'mn', 'accident_month', mapMonth);
   const filtrtAccidentType = getFilterByDictionary(queryObject, 'acc', 'accident_type_hebrew', mapAccidentType);
   const filterVehicle = getFilterByDictionary(queryObject, 'vcl', 'vehicle_vehicle_type_hebrew', mapVehicle);
+  const filterLoactionAccuracy = getFilterByDictionary(queryObject, 'lca', 'location_accuracy_hebrew', mapLocationAccuracy); 
   const filterRoadType = getFilterByDictionary(queryObject, 'rt', 'road_type_hebrew', mapRoadType);
   const filterSpeedLimit = getFilterByDictionary(queryObject, 'sp', 'speed_limit_hebrew', mapSpeedLimit);
   const filterRoadWidth = getFilterByDictionary(queryObject, 'rw', 'road_width_hebrew', mapRoadWidth);
@@ -185,6 +187,7 @@ function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup:
   if (filterMonth) arrAnd.push(filterMonth);
   if (filtrtAccidentType) arrAnd.push(filtrtAccidentType);
   if (filterVehicle) arrAnd.push(filterVehicle);
+  if (filterLoactionAccuracy) arrAnd.push(filterLoactionAccuracy);
   if (filterRoadType) arrAnd.push(filterRoadType);
   if (filterSpeedLimit) arrAnd.push(filterSpeedLimit);
   if (filterRoadWidth) arrAnd.push(filterRoadWidth);
