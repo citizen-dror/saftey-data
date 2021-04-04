@@ -45,7 +45,10 @@ exports.accident_get_agg_list_DAL = (agg: any, type: string) => {
   return AccidentMoedel2.aggregate(agg);
 };
 
-exports.accident_getGroupBy_DAL = (agg: any) => AccidentMoedel2.aggregate(agg);
+exports.accident_getGroupBy_DAL = (agg: any) =>{
+  // console.log(JSON.stringify(agg));
+  return AccidentMoedel2.aggregate(agg);
+} 
 // console.log(JSON.stringify(agg));
 
 exports.accident_get_find_list_DAL = (find: any, type: string) => {

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import {AccidentQuery} from './AccidentQuery';
+import { AccidentQuery } from './AccidentQuery';
 
 const getFilterYear = (queryObject: AccidentQuery) => {
   const { sy, ey } = queryObject;
@@ -52,7 +52,7 @@ function getQueryDBnamesMap() {
   map.set('city', 'accident_yishuv_name');
   map.set('cpop', 'cpop');
   map.set('st', 'street1_hebrew');
-  map.set('lca','location_accuracy_hebrew');
+  map.set('lca', 'location_accuracy_hebrew');
   map.set('rd', 'road1');
   map.set('rds', 'road_segment_name');
   map.set('sex', 'sex_hebrew');
@@ -81,12 +81,12 @@ const queryDBnamesMap = getQueryDBnamesMap();
  * @param {string} colName - column name in db.
  * @param {Map} mapFilterValues - Map of values in query (key) and db (value).
  */
-function getFilterByDictionary(queryObject: AccidentQuery, qName: string, colName: string, mapFilterValues: Map<any,any>) {
+function getFilterByDictionary(queryObject: AccidentQuery, qName: string, colName: string, mapFilterValues: Map<any, any>) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
     if (queryValsArr && queryValsArr.length > 0) {
-      const arr = queryValsArr.map((x:any) => ({ [colName]: mapFilterValues.get(x) }));
+      const arr = queryValsArr.map((x: any) => ({ [colName]: mapFilterValues.get(x) }));
       const filter = { $or: arr };
       return filter;
     }
@@ -98,7 +98,7 @@ function getFilterByQurey(queryObject: AccidentQuery, qName: string, colName: st
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
     if (queryValsArr && queryValsArr.length > 0) {
-      const arr = queryValsArr.map((x:any) => ({ [colName]: x }));
+      const arr = queryValsArr.map((x: any) => ({ [colName]: x }));
       const filter = { $or: arr };
       return filter;
     }
@@ -163,7 +163,7 @@ function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup:
   const filterMonth = getFilterByDictionary(queryObject, 'mn', 'accident_month', mapMonth);
   const filtrtAccidentType = getFilterByDictionary(queryObject, 'acc', 'accident_type_hebrew', mapAccidentType);
   const filterVehicle = getFilterByDictionary(queryObject, 'vcl', 'vehicle_vehicle_type_hebrew', mapVehicle);
-  const filterLoactionAccuracy = getFilterByDictionary(queryObject, 'lca', 'location_accuracy_hebrew', mapLocationAccuracy); 
+  const filterLoactionAccuracy = getFilterByDictionary(queryObject, 'lca', 'location_accuracy_hebrew', mapLocationAccuracy);
   const filterRoadType = getFilterByDictionary(queryObject, 'rt', 'road_type_hebrew', mapRoadType);
   const filterSpeedLimit = getFilterByDictionary(queryObject, 'sp', 'speed_limit_hebrew', mapSpeedLimit);
   const filterRoadWidth = getFilterByDictionary(queryObject, 'rw', 'road_width_hebrew', mapRoadWidth);
@@ -171,7 +171,7 @@ function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup:
   const filterOneLane = getFilterByDictionary(queryObject, 'ol', 'one_lane_hebrew', mapOneLane);
 
   // return filterSev;
-  const arrAnd : any[] = [
+  const arrAnd: any[] = [
     filterYear,
   ];
   if (filterSev) arrAnd.push(filterSev);
@@ -207,7 +207,7 @@ function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup:
   return filterObj;
 }
 
-function getGroupByCityPop(limit:any, sort: any) {
+function getGroupByCityPop(limit: any, sort: any) {
   let filter = null;
   const group1 = JSON.parse('{"$group": {'
     + '"_id": "$accident_yishuv_name","t_count" : { "$sum" : 1 },"t_population" : { "$first" : "$city.population" }'
@@ -252,11 +252,12 @@ function getGroupBy(queryObject: any) {
   return res;
 }
 
-function getSort() {
+function getSort(queryObject: AccidentQuery) {
+  const { sort } = queryObject;
+  const sDir = (sort > 0)? 1: -1;
+  const sObject = (sort) ? { count: sDir } : { _id: 1 }
   return {
-    $sort: {
-      _id: 1,
-    },
+    $sort: sObject,
   };
 }
 
@@ -271,7 +272,7 @@ function getFilterGroupBy(queryObject: AccidentQuery) {
     return [...filter, ...groupBy];
   }
   const groupBy = getGroupBy(queryObject);
-  const sort = getSort();
+  const sort = getSort(queryObject);
   return [...filter, ...groupBy, sort];
 }
 

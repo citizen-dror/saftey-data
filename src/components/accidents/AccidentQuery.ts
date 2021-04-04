@@ -24,4 +24,5 @@ export interface AccidentQuery {
     gb?: string,
     gb2?: string,
     proj? : string,
+    sort?: number, 
   };
