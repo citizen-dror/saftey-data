@@ -22,5 +22,6 @@ export interface AccidentQuery {
     p1?: string,
     p2?: string,
     gb?: string,
-    gb2?: string
+    gb2?: string,
+    proj? : string,
   };
