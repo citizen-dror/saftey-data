@@ -253,7 +253,7 @@ function getGroupBy(queryObject: any) {
 }
 
 function getSort(queryObject: AccidentQuery) {
-  const { sort } = queryObject;
+  const sort = parseInt(queryObject.sort,10);
   const sDir = (sort > 0)? 1: -1;
   const sObject = (sort) ? { count: sDir } : { _id: 1 }
   return {
@@ -273,7 +273,14 @@ function getFilterGroupBy(queryObject: AccidentQuery) {
   }
   const groupBy = getGroupBy(queryObject);
   const sort = getSort(queryObject);
-  return [...filter, ...groupBy, sort];
+  const res =  [...filter, ...groupBy, sort];
+  if (queryObject.limit) {
+    const limit = parseInt(queryObject.limit,10);
+    console.log(typeof limit);
+    const limitF = (limit === 0) ? null : { $limit: limit };
+    if (limitF) res.push(limitF);
+  }
+  return res;
 }
 
 module.exports = { getFilter, getFilterGroupBy };
