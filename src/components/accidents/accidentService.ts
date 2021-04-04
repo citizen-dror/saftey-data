@@ -21,16 +21,23 @@ const accident_GroupBy_post = async (query: any) => {
   return res;
 };
 
+const getProjType = (queryObject :AccidentQuery) =>{
+  const { proj } = queryObject;
+  const pType = (proj) ? proj : 'main';
+  return pType;
+}
+
 const accident_get = async (queryObject: AccidentQuery) => {
   // console.log(queryObject);
   const filterObj = accFilter.getFilter(queryObject, false);
+  const pType = getProjType(queryObject);
   // console.log(filterObj);
   const { fType, filter } = filterObj;
   let res = null;
   if (fType === 'find') {
-    res = await accidentDAL.accident_get_find_list_DAL(filter, 'main');
+    res = await accidentDAL.accident_get_find_list_DAL(filter, pType, -1);
   } else {
-    res = await accidentDAL.accident_get_agg_list_DAL(filter, 'main');
+    res = await accidentDAL.accident_get_agg_list_DAL(filter, pType);
   }
   return res;
 };
