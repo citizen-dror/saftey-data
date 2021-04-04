@@ -274,8 +274,8 @@ function getFilterGroupBy(queryObject: AccidentQuery) {
   const groupBy = getGroupBy(queryObject);
   const sort = getSort(queryObject);
   const res =  [...filter, ...groupBy, sort];
-  if (queryObject.limit) {
-    const limit = parseInt(queryObject.limit,10);
+  if (queryObject.lim) {
+    const limit = parseInt(queryObject.lim,10);
     console.log(typeof limit);
     const limitF = (limit === 0) ? null : { $limit: limit };
     if (limitF) res.push(limitF);
