@@ -1,34 +1,34 @@
-const accidentDAL = require('./accidentDAL');
 const accFilter = require('./accidentFilter');
 import {AccidentQuery} from './AccidentQuery';
+import accidentDAL from './accidentDAL';
 // const logger = require('../../middlewares/logger');
 
-
+class accidentService {
 // count all accidens by filter from post
-const accident_count = async (query: any ) => {
-  const res = await accidentDAL.accident_count_DAL(query);
+public count_post = async (query: any ) => {
+  const res = await accidentDAL.accident_count(query);
   return res;
 };
 
 // get all accidens by filter (post)
-const accident_getList = async (query: any, type) => {
-  const res = await accidentDAL.accident_get_agg_list_DAL(query, type);
+public getList_post = async (query: any, type) => {
+  const res = await accidentDAL.accident_get_agg_list(query, type);
   return res;
 };
 
 // get group by accidens by filter
-const accident_GroupBy_post = async (query: any) => {
-  const res = await accidentDAL.accident_getGroupBy_DAL(query);
+public groupBy_post = async (query: any) => {
+  const res = await accidentDAL.accident_getGroupBy(query);
   return res;
 };
 
-const getProjType = (queryObject :AccidentQuery) =>{
+private getProjType = (queryObject :AccidentQuery) =>{
   const { proj } = queryObject;
   const pType = (proj) ? proj : 'main';
   return pType;
 }
 
-const isAllFiltr = (queryObject :AccidentQuery) => {
+public isAllFiltr = (queryObject :AccidentQuery) => {
   let res =false
   if (Object.keys(queryObject).length === 0 ) res = true;
   else if (Object.keys(queryObject).length >= 3) {
@@ -46,36 +46,38 @@ const isAllFiltr = (queryObject :AccidentQuery) => {
   return res;
 }
 
-const accident_get = async (queryObject: AccidentQuery) => {
+public get_list = async (queryObject: AccidentQuery) => {
   // console.log(queryObject);
   const filterObj = accFilter.getFilter(queryObject, false);
-  const pType = getProjType(queryObject);
+  const pType = this.getProjType(queryObject);
   // console.log(filterObj);
   const { fType, filter } = filterObj;
   let res = null;
   if (fType === 'find') {
-    res = await accidentDAL.accident_get_find_list_DAL(filter, pType, -1);
+    res = await accidentDAL.accident_get_find_list(filter, pType);
   } else {
-    res = await accidentDAL.accident_get_agg_list_DAL(filter, pType);
+    res = await accidentDAL.accident_get_agg_list(filter, pType);
   }
   return res;
 };
 
-const accident_count_get = async (queryObject: AccidentQuery) => {
+public count_get = async (queryObject: AccidentQuery) => {
   // console.log(queryObject);
   const filterObj = accFilter.getFilter(queryObject, false);
   // console.log(filterObj);
   const { filter } = filterObj;
-  const res = await accidentDAL.accident_count_DAL(filter, 'main');
+  const res = await accidentDAL.accident_count(filter);
   return res;
 };
 
-const accident_getGroupBy = async (queryObject: AccidentQuery) => {
+public getGroupBy = async (queryObject: AccidentQuery) => {
   // console.log(queryObject);
   const filterGroupBy = accFilter.getFilterGroupBy(queryObject);
   // console.log(JSON.stringify(filterGroupBy));
-  const res = await accidentDAL.accident_getGroupBy_DAL(filterGroupBy);
+  const res = await accidentDAL.accident_getGroupBy(filterGroupBy);
   return res;
-};
+}
+}
+export default new accidentService();
 
-export {accident_getGroupBy, accident_count_get, accident_get, accident_count, accident_getList, accident_GroupBy_post, isAllFiltr}
+//export {accident_getGroupBy, accident_count_get, accident_get, accident_count, accident_getList, accident_GroupBy_post, isAllFiltr}

@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-const service = require('./accidentService');
 import path from 'path';
 import { createReadStream, stat } from 'fs';
 import { promisify } from 'util';
 import { AccidentQuery } from './AccidentQuery';
+import accidentService from './accidentService';
 
 const fileName =`${path.join(__dirname, '../../../uploads/get_accidents-json-all.json')}`
 const fileInfo = promisify(stat);
@@ -16,10 +16,10 @@ const accidentRoute = (app: Router) => {
   // get list of accidets aggregate a filter by query body, return deteail projection
   route.get('/', async (req, res) => {
     const queryObject: AccidentQuery = req.query;
-    if (service.isAllFiltr(queryObject)) {
+    if (accidentService.isAllFiltr(queryObject)) {
       getAllFromFile(res);
     } else {
-      const doc = await service.accident_get(queryObject);
+      const doc = await accidentService.get_list(queryObject);
       return res.json(doc);
     }
 
@@ -40,14 +40,14 @@ const accidentRoute = (app: Router) => {
   // count accidents by query query
   route.get('/count/', async (req, res) => {
     const queryObject = req.query;
-    const doc = await service.accident_count_get(queryObject);
+    const doc = await accidentService.count_get(queryObject);
     return res.json(doc);
   });
 
   // filter+ group accidents by query
   route.get('/groupby/', async (req, res) => {
     const queryObject = req.query;
-    const doc = await service.accident_getGroupBy(queryObject);
+    const doc = await accidentService.getGroupBy(queryObject);
     return res.json(doc);
   });
 
