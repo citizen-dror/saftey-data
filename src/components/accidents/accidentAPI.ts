@@ -1,5 +1,13 @@
 import { Router, Request, Response } from 'express';
 const service = require('./accidentService');
+import path from 'path';
+import { createReadStream, stat } from 'fs';
+import { promisify } from 'util';
+import { AccidentQuery } from './AccidentQuery';
+
+const fileName =`${path.join(__dirname, '../../../uploads/get_accidents-json-all.json')}`
+const fileInfo = promisify(stat);
+
 const route = Router();
 
 const accidentRoute = (app: Router) => {
@@ -7,10 +15,27 @@ const accidentRoute = (app: Router) => {
 
   // get list of accidets aggregate a filter by query body, return deteail projection
   route.get('/', async (req, res) => {
-    const queryObject = req.query;
-    const doc = await service.accident_get(queryObject);
-    return res.json(doc);
+    const queryObject: AccidentQuery = req.query;
+    if (service.isAllFiltr(queryObject)) {
+      getAllFromFile(res);
+    } else {
+      const doc = await service.accident_get(queryObject);
+      return res.json(doc);
+    }
+
   });
+
+  const getAllFromFile = async (res :Response) => {
+    const { size } = await fileInfo(fileName);
+    res.writeHead(200, {
+        'Content-Length': size,
+        'Content-Type': 'application/json; charset=utf-8'
+    });
+    createReadStream(fileName).pipe(res).on('error', console.error);
+  };
+
+ // get list of accidets aggregate a filter by query body, return deteail projection
+ route.get('/all', (req, res) => getAllFromFile(res));
 
   // count accidents by query query
   route.get('/count/', async (req, res) => {

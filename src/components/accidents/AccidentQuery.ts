@@ -1,7 +1,7 @@
 export interface AccidentQuery {
     sy?: string,
     ey?: string,
-    sev?: number,
+    sev?: string,
     injt?: number,
     city?: string,
     st?: string,
