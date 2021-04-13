@@ -1,6 +1,7 @@
 import expressLoader from './expressLoader';
 import rateLimitLoader from './rateLimitLoader';
 import helmetLoader from './helmetLoader';
+const {connect} = require('../database1');
 // import mongooseLoader from './mongoose';
 import logger from '../middlewares/logger';
 
@@ -13,7 +14,7 @@ const loader = async ({ expressApp }) => {
 
   // const mongoConnection = await mongooseLoader();
   // eslint-disable-next-line no-unused-vars
-  const db = require('../database1');
+  await connect();
   logger.info('MongoDB Initialized');
 
   await expressLoader({ app: expressApp });
