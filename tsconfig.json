@@ -11,6 +11,6 @@
     "lib": ["es2015"],
     "include": [
       "src/**/*",
-      "src/**/*.json",
+      "src/**/*.json", "test/accidents",
     ]
   }

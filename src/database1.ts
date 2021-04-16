@@ -14,6 +14,10 @@ const dbUrl = `mongodb://${user}:${password}@cluster0-shard-00-00-cf64j.mongodb.
 //DB Connection
 const connect = async () => {
   try {
+    if(process.env.NODE_ENV === 'test')
+    {
+      console.log('test!')
+    }
     await mongoose.connect(
       dbUrl,
       { useNewUrlParser: true, useUnifiedTopology: true }
