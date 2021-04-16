@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const request = require('supertest');
-const app = require('../../src/app.js');
+const app = require('../../../src/app.js');
 
 describe('homepage', () => {
   it('welcome the user', (done) => {
