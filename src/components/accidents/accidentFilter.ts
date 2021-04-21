@@ -4,8 +4,8 @@ import { AccidentQuery } from './AccidentQuery';
 
 const getFilterYear = (queryObject: AccidentQuery) => {
   const { sy, ey } = queryObject;
-  const sYear = (sy) ? parseInt(sy, 10) : 2015;
-  const eYear = (ey) ? parseInt(ey, 10) : 2019;
+  const sYear = (sy) ? parseInt(sy, 10) : 2016;
+  const eYear = (ey) ? parseInt(ey, 10) : 2020;
   return { accident_year: { $gte: sYear, $lte: eYear } };
 };
 
