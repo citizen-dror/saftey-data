@@ -33,6 +33,7 @@ const mapDayNight = jsonToMap('day_night');
 const mapMonth = jsonToMap('accident_month');
 const mapAccidentType = jsonToMap('accident_type');
 const mapVehicle = jsonToMap('vehicle_vehicle_type');
+const mapInvVehicle = jsonToMap('vehicle_inv_type');
 const mapLocationAccuracy = jsonToMap('location_accuracy');
 const mapRoadType = jsonToMap('road_type');
 const mapSpeedLimit = jsonToMap('speed_limit');
@@ -80,13 +81,23 @@ const queryDBnamesMap = getQueryDBnamesMap();
  * @param {string} qName - query parmter name.
  * @param {string} colName - column name in db.
  * @param {Map} mapFilterValues - Map of values in query (key) and db (value).
+ * @param {boolean} useLike - use like -  regex query for partial-string-matching  
  */
-function getFilterByDictionary(queryObject: AccidentQuery, qName: string, colName: string, mapFilterValues: Map<any, any>) {
+function getFilterByDictionary(queryObject: AccidentQuery, 
+  qName: string, 
+  colName: string, 
+  mapFilterValues: Map<any, any>,
+  useLike:boolean=false) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
     if (queryValsArr && queryValsArr.length > 0) {
-      const arr = queryValsArr.map((x: any) => ({ [colName]: mapFilterValues.get(x) }));
+      let arr = null;
+      if(useLike){
+         arr = queryValsArr.map((x: any) => ({ [colName]:{"$regex":`^${mapFilterValues.get(x)}*`} }));
+      } else {
+         arr = queryValsArr.map((x: any) => ({ [colName]: mapFilterValues.get(x) }));
+      }
       const filter = { $or: arr };
       return filter;
     }
@@ -163,6 +174,7 @@ function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup:
   const filterMonth = getFilterByDictionary(queryObject, 'mn', 'accident_month', mapMonth);
   const filtrtAccidentType = getFilterByDictionary(queryObject, 'acc', 'accident_type_hebrew', mapAccidentType);
   const filterVehicle = getFilterByDictionary(queryObject, 'vcl', 'vehicle_vehicle_type_hebrew', mapVehicle);
+  const filterInvVehicle = getFilterByDictionary(queryObject, 'vcli', 'vehicles', mapInvVehicle, true);
   const filterLoactionAccuracy = getFilterByDictionary(queryObject, 'lca', 'location_accuracy_hebrew', mapLocationAccuracy);
   const filterRoadType = getFilterByDictionary(queryObject, 'rt', 'road_type_hebrew', mapRoadType);
   const filterSpeedLimit = getFilterByDictionary(queryObject, 'sp', 'speed_limit_hebrew', mapSpeedLimit);
@@ -187,6 +199,7 @@ function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup:
   if (filterMonth) arrAnd.push(filterMonth);
   if (filtrtAccidentType) arrAnd.push(filtrtAccidentType);
   if (filterVehicle) arrAnd.push(filterVehicle);
+  if (filterInvVehicle) arrAnd.push(filterInvVehicle);
   if (filterLoactionAccuracy) arrAnd.push(filterLoactionAccuracy);
   if (filterRoadType) arrAnd.push(filterRoadType);
   if (filterSpeedLimit) arrAnd.push(filterSpeedLimit);
