@@ -51,6 +51,11 @@ const accidentRoute = (app: Router) => {
     return res.json(doc);
   });
 
+  // Add a health check route in express
+  route.get('/health', (req, res) => {
+    res.status(200).send('ok');
+  })
+
   route.get('/test', (req: Request, res: Response) => {
     return res.json({ user: 'mosh' }).status(200);
   });
