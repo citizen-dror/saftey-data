@@ -1,6 +1,13 @@
 const AccidentMoedel2 = require('./accident');
 
-class accidentDAL {
+export interface accidentDALInterface {
+  accident_count: (filter: any) => any,
+  accident_get_agg_list: (agg: any, type: string) => any,
+  accident_getGroupBy: (agg: any) => any,
+  accident_get_find_list: (find: any, type: string) => any
+}
+
+class accidentDAL implements accidentDALInterface {
 
   private getProjByType = (type: string) => {
     let proj = {};
