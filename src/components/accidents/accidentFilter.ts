@@ -94,7 +94,7 @@ function getFilterByDictionary(queryObject: AccidentQuery,
     if (queryValsArr && queryValsArr.length > 0) {
       let arr = null;
       if(useLike){
-         arr = queryValsArr.map((x: any) => ({ [colName]:{"$regex":`^${mapFilterValues.get(x)}*`} }));
+         arr = queryValsArr.map((x: any) => ({ [colName]:{"$regex":`${mapFilterValues.get(x)}*`} }));
       } else {
          arr = queryValsArr.map((x: any) => ({ [colName]: mapFilterValues.get(x) }));
       }
