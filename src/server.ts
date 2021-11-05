@@ -19,8 +19,8 @@ async function startServer() {
       🛡️  Server listening on port: ${port} 🛡️
       ################################################
     `);
-    terminateLoader({server:server});
-    logger.info('treminate Loader Initialized');;
+    // terminateLoader({server:server});
+    // logger.info('treminate Loader Initialized');;
   }).on('error', (err) => {
     logger.error(err);
     process.exit(1);
