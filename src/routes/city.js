@@ -33,7 +33,6 @@ const findAll = (req, res) => {
     .catch((err) => res.status(500).jsonp(err));
 };
 
-
 // find city by post
 router.post('/', (req, res) => {
   if (!req.body) {

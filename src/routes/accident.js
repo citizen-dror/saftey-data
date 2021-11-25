@@ -1,7 +1,7 @@
 const express = require('express');
 const AccidentMoedel = require('../models/accidents.model');
 const cache = require('../middlewares/cache');
-const logger = require('../middlewares/logger');
+const logger = require('../middlewares/logger.ts');
 
 const router = express.Router();
 const isUseCache = false;
