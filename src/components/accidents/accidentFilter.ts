@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { AccidentQuery } from './AccidentQuery';
+// import logger from '../../middlewares/logger';
 
 const getFilterYear = (queryObject: AccidentQuery) => {
   const { sy, ey } = queryObject;
@@ -63,6 +64,7 @@ function getQueryDBnamesMap() {
   map.set('mn', 'accident_month');
   map.set('wd', 'day_in_week_hebrew');
   map.set('acc', 'accident_type_hebrew');
+  map.set('selfacc', 'accident_type_hebrew');
   map.set('vcl', 'vehicle_vehicle_type_hebrew');
   map.set('vcli', 'vehicles');
   map.set('rt', 'road_type_hebrew');
@@ -241,6 +243,7 @@ function getGroupBy(queryObject: any) {
   const queryPart = queryObject.gb;
   if (queryPart) {
     const groupName1 = queryDBnamesMap.get(queryPart);
+    // logger.info('groupName1', queryPart, groupName1);
     const queryP2 = queryObject.gb2;
     if (queryP2) {
       const groupName2 = queryDBnamesMap.get(queryP2);
