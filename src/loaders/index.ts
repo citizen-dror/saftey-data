@@ -1,11 +1,15 @@
 import expressLoader from './expressLoader';
 import rateLimitLoader from './rateLimitLoader';
 import helmetLoader from './helmetLoader';
+import corsLoder from './corsLoader';
 const {connect} = require('../database1');
 // import mongooseLoader from './mongoose';
 import logger from '../middlewares/logger';
 
 const loader = async ({ expressApp }) => {
+  await corsLoder({app: expressApp});
+  logger.info('cors Loader Initialized');
+
   await helmetLoader({ app: expressApp });
   logger.info('helmet Loader Initialized');
 
