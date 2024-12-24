@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
 import path from 'path';
 import { createReadStream, stat } from 'fs';
 import { promisify } from 'util';
@@ -9,22 +9,21 @@ import accidentDAL from './accidentDAL';
 const fileName =`${path.join(__dirname, '../../../uploads/get_accidents-json-all.json')}`
 const fileInfo = promisify(stat);
 
-const route = Router();
+const router = Router(); 
 
-const accidentRoute = (app: Router) => {
-  app.use('/api/v1/accident', route);
+const accidentRoute = (app:express.Application) => {
+  app.use('/api/v1/accident', router);
   const service = new accidentService(accidentDAL); 
   
   // get list of accidets aggregate a filter by query body, return deteail projection
-  route.get('/', async (req, res) => {
+  router.get('/', async (req:Request, res:Response) => {
     const queryObject: AccidentQuery = req.query;
-    if (service.isAllFiltr(queryObject)) {
-      getAllFromFile(res);
-    } else {
+    //if (service.isAllFiltr(queryObject)) {
+      //getAllFromFile(res);
+    //} else {
       const doc = await service.get_list(queryObject);
       return res.json(doc);
-    }
-
+    //}
   });
 
   const getAllFromFile = async (res :Response) => {
@@ -37,29 +36,29 @@ const accidentRoute = (app: Router) => {
   };
 
  // get list of accidets aggregate a filter by query body, return deteail projection
- route.get('/all', (req, res) => getAllFromFile(res));
+ router.get('/all', (req, res) => getAllFromFile(res));
 
   // count accidents by query query
-  route.get('/count/', async (req, res) => {
+  router.get('/count/', async (req, res) => {
     const queryObject = req.query;
     const doc = await service.count_get(queryObject);
     return res.json(doc);
   });
 
   // filter+ group accidents by query
-  route.get('/groupby/', async (req, res) => {
+  router.get('/groupby/', async (req, res) => {
     const queryObject = req.query;
     const doc = await service.getGroupBy(queryObject);
     return res.json(doc);
   });
 
   // Add a health check route in express
-  route.get('/health', (req, res) => {
+  router.get('/health', (req, res) => {
     res.status(200).send('ok');
   })
 
-  route.get('/test', (req: Request, res: Response) => {
-    return res.json({ user: 'mosh' }).status(200);
+  router.get('/test', (req: Request, res: Response) => { 
+    return res.json({ user: 'mosh' });
   });
 };
 
