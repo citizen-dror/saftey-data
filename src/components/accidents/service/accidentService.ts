@@ -1,11 +1,11 @@
 const accFilter = require('./accidentFilter');
-import { AccidentQuery } from './AccidentQuery';
-import { accidentDALInterface } from './accidentDAL';
-const logger = require('../../middlewares/logger');
+import logger from '../../../middlewares/logger';
+import iAccidentQuery  from '../models/iAccidentQuery';
+import IAccidentDAL from '../dal/iAccidentDAL';
 
 class accidentService {
-  accidentDAL: accidentDALInterface;
-  constructor(accidentDAL: accidentDALInterface) {
+  accidentDAL: IAccidentDAL;
+  constructor(accidentDAL: IAccidentDAL) {
     this.accidentDAL = accidentDAL;
   };
   // count all accidens by filter from post
@@ -26,13 +26,13 @@ class accidentService {
     return res;
   };
 
-  private getProjType = (queryObject: AccidentQuery) => {
+  private getProjType = (queryObject: iAccidentQuery) => {
     const { proj } = queryObject;
     const pType = (proj) ? proj : 'main';
     return pType;
   }
 
-  public isAllFiltr = (queryObject: AccidentQuery) => {
+  public isAllFiltr = (queryObject: iAccidentQuery) => {
     let res = false
     if (Object.keys(queryObject).length === 0) res = true;
     else if (Object.keys(queryObject).length >= 3) {
@@ -50,7 +50,8 @@ class accidentService {
     return res;
   }
 
-  public get_list = async (queryObject: AccidentQuery) => {
+  public get_list = async (queryObject: iAccidentQuery) => {
+    // logger.info('acc srv - get list ');
     // console.log(queryObject);
     const filterObj = accFilter.getFilter(queryObject, false);
     const pType = this.getProjType(queryObject);
@@ -65,7 +66,7 @@ class accidentService {
     return res;
   };
 
-  public count_get = async (queryObject: AccidentQuery) => {
+  public count_get = async (queryObject: iAccidentQuery) => {
     // console.log(queryObject);
     const filterObj = accFilter.getFilter(queryObject, false);
     // console.log(filterObj);
@@ -74,7 +75,7 @@ class accidentService {
     return res;
   };
 
-  public getGroupBy = async (queryObject: AccidentQuery) => {
+  public getGroupBy = async (queryObject: iAccidentQuery) => {
     // console.log(queryObject);
     const filterGroupBy = accFilter.getFilterGroupBy(queryObject);
     // console.log(JSON.stringify(filterGroupBy));

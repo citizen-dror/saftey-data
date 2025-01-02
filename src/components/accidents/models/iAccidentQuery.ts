@@ -1,4 +1,4 @@
-export interface AccidentQuery {
+export default interface iAccidentQuery {
     sy?: string,
     ey?: string,
     sev?: string,

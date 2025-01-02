@@ -11,7 +11,8 @@
       "resolveJsonModule": true
     },
     "include": [
-      "src/**/*"
+      "src/**/*",
+      "src/components/accidents/service/filterCols.json"
     ],
     "exclude": [
       "node_modules"

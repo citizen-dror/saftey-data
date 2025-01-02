@@ -1,13 +1,9 @@
-const AccidentMoedel2 = require('./accident');
+const AccidentModel2 = require('./accidentSchema');
+import IMongoFilterQuery from '../models/iMongoFilterQuery1';
+import IMongoMatchQuery from '../models/iMongoMatchQuery1';
+import IAccidentDAL from './iAccidentDAL';
 
-export interface accidentDALInterface {
-  accident_count: (filter: any) => any,
-  accident_get_agg_list: (agg: any, type: string) => any,
-  accident_getGroupBy: (agg: any) => any,
-  accident_get_find_list: (find: any, type: string) => any
-}
-
-class accidentDAL implements accidentDALInterface {
+class accidentDAL implements IAccidentDAL {
 
   private getProjByType = (type: string) => {
     let proj = {};
@@ -46,23 +42,23 @@ class accidentDAL implements accidentDALInterface {
     return proj;
   };
 
-  public accident_count = (filter: any) => AccidentMoedel2.countDocuments(filter);
+  public accident_count = (filter: IMongoMatchQuery) => AccidentModel2.countDocuments(filter);
 
-  public accident_get_agg_list = (agg: any, type: string) => {
+  public accident_get_agg_list = (agg: IMongoFilterQuery, type: string) => {
     const proj = { $project: this.getProjByType(type) };
     agg.push(proj);
-    return AccidentMoedel2.aggregate(agg);
+    return AccidentModel2.aggregate(agg);
   };
 
-  public accident_getGroupBy = (agg: any) => {
+  public accident_getGroupBy = (agg: IMongoFilterQuery) => {
     // console.log(JSON.stringify(agg));
-    return AccidentMoedel2.aggregate(agg);
+    return AccidentModel2.aggregate(agg);
   }
   // console.log(JSON.stringify(agg));
 
-  public accident_get_find_list = (find: any, type: string) => {
+  public accident_get_find_list = (find: IMongoFilterQuery, type: string) => {
     const proj = this.getProjByType(type);
-    return AccidentMoedel2.find(find, proj);
+    return AccidentModel2.find(find, proj);
   };
 }
 export default new accidentDAL();

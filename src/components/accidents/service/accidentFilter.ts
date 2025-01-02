@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { AccidentQuery } from './AccidentQuery';
+import iAccidentQuery from '../models/iAccidentQuery';
 // import logger from '../../middlewares/logger';
 
-const getFilterYear = (queryObject: AccidentQuery) => {
+const getFilterYear = (queryObject: iAccidentQuery) => {
   const { sy, ey } = queryObject;
   const sYear = (sy) ? parseInt(sy, 10) : 2016;
   const eYear = (ey) ? parseInt(ey, 10) : 2020;
@@ -79,13 +79,13 @@ const queryDBnamesMap = getQueryDBnamesMap();
 
 /**
  * create filter from query string sentence
- * @param {AccidentQuery} queryObject - query objcet form the request
+ * @param {iAccidentQuery} queryObject - query objcet form the request
  * @param {string} qName - query parmter name.
  * @param {string} colName - column name in db.
  * @param {Map} mapFilterValues - Map of values in query (key) and db (value).
  * @param {boolean} useLike - use like -  regex query for partial-string-matching  
  */
-function getFilterByDictionary(queryObject: AccidentQuery, 
+function getFilterByDictionary(queryObject: iAccidentQuery, 
   qName: string, 
   colName: string, 
   mapFilterValues: Map<any, any>,
@@ -106,7 +106,7 @@ function getFilterByDictionary(queryObject: AccidentQuery,
   }
   return null;
 }
-function getFilterByQurey(queryObject: AccidentQuery, qName: string, colName: string) {
+function getFilterByQurey(queryObject: iAccidentQuery, qName: string, colName: string) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
@@ -119,7 +119,7 @@ function getFilterByQurey(queryObject: AccidentQuery, qName: string, colName: st
   return null;
 }
 
-function getFilter2FildsByQurey(queryObject: AccidentQuery, qName: string, colName1: string, colName2: string) {
+function getFilter2FildsByQurey(queryObject: iAccidentQuery, qName: string, colName1: string, colName2: string) {
   const queryPart = queryObject[qName];
   if (queryPart) {
     const queryValsArr = JSON.parse(`[${queryPart}]`);
@@ -133,7 +133,7 @@ function getFilter2FildsByQurey(queryObject: AccidentQuery, qName: string, colNa
   }
   return null;
 }
-function getFilterbyCityPop(queryObject: AccidentQuery, addLookup: boolean) {
+function getFilterbyCityPop(queryObject: iAccidentQuery, addLookup: boolean) {
   let filter = null;
   const lookup = {
     $lookup: {
@@ -160,7 +160,7 @@ function getFilterbyCityPop(queryObject: AccidentQuery, addLookup: boolean) {
   return filter;
 }
 
-function getFilter(queryObject: AccidentQuery, useMatch: boolean, addCityLookup: boolean) {
+function getFilter(queryObject: iAccidentQuery, useMatch: boolean, addCityLookup: boolean) {
   // return AccidentMoedel2.find({ accident_year: 2016 })
   const filterYear = getFilterYear(queryObject);
   const filterSev = getFilterByDictionary(queryObject, 'sev', queryDBnamesMap.get('sev'), mapInjSevirty);
@@ -268,7 +268,7 @@ function getGroupBy(queryObject: any) {
   return res;
 }
 
-function getSort(queryObject: AccidentQuery) {
+function getSort(queryObject: iAccidentQuery) {
   const sort = parseInt(queryObject.sort,10);
   const sDir = (sort > 0)? 1: -1;
   const sObject = (sort) ? { count: sDir } : { _id: 1 }
@@ -277,7 +277,7 @@ function getSort(queryObject: AccidentQuery) {
   };
 }
 
-function getFilterGroupBy(queryObject: AccidentQuery) {
+function getFilterGroupBy(queryObject: iAccidentQuery) {
   const queryPart = queryObject.gb;
   const groupName1 = queryDBnamesMap.get(queryPart);
   const groupByCityPop = (groupName1 === 'cpop');
