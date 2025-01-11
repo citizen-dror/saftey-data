@@ -1,16 +1,22 @@
 {
     "compilerOptions": {
-      "module": "commonjs",
+      "module": "CommonJS",
+      "lib": ["ESNext", "DOM"],
       "esModuleInterop": true,
-      "target": "es6",
+      "target": "es2020",
       "moduleResolution": "node",
       "sourceMap": true,
-      "outDir": "dist",
-      "resolveJsonModule": true,
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "resolveJsonModule": true
     },
-    "lib": ["es2015"],
     "include": [
-      "src/**/*",
-      "src/**/*.json", "src/accidents", "src/test/accidents", "src/test/accidents"
+      "src/**/*.ts",                
+      "src/**/*.json",   
+      "src/components/accidents/service/filterCols.json"
+    ],
+    "exclude": [
+      "node_modules", 
+      "dist"         
     ]
   }
