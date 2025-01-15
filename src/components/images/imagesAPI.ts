@@ -13,14 +13,14 @@ const imageRoute = (app: Router) => {
   app.use('/api/v1/img', router);
 
   //controlers
-  router.get('/tags/:lang/:tag', async (req, res) => {
+  router.get('/tags/:lang/:tag', async (req:Request, res:Response) => {
     const { lang, tag } = req.params;
     const doc = await get_image_by_tag(lang, tag);
-    return res.jsonp(doc);
+    return res.json(doc);
   });
 
-  router.get('/tags/:tag', async (req, res) => {
-    const { lang, tag } = req.params;
+  router.get('/tags/:tag', async (req:Request, res:Response) => {
+    const { tag } = req.params;
     const doc = await get_image_by_tag('', tag);
     return res.jsonp(doc);
   });

@@ -3,7 +3,7 @@
       "module": "CommonJS",
       "lib": ["ESNext", "DOM"],
       "esModuleInterop": true,
-      "target": "es2020",
+      "target": "ES2022",
       "moduleResolution": "node",
       "sourceMap": true,
       "outDir": "./dist",
@@ -11,12 +11,10 @@
       "resolveJsonModule": true
     },
     "include": [
-      "src/**/*.ts",                
-      "src/**/*.json",   
+      "src/**/*",
       "src/components/accidents/service/filterCols.json"
     ],
     "exclude": [
-      "node_modules", 
-      "dist"         
+      "node_modules"
     ]
   }

@@ -4,7 +4,7 @@ import path from 'path';
 
 // import * as cors from 'cors';
 import imageRoute from '../components/images/imagesAPI';
-import accidentRoute from '../components/accidents/accidentAPI';
+import accidentRoute from '../components/accidents/api/accidentAPI';
 import cityRoute from '../components/cities/cityAPI';
 import morganMiddleware from './morganLoader';
 import logger from '../middlewares/logger';
