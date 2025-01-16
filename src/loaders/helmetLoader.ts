@@ -10,7 +10,11 @@ const helmetLoder = async ({ app }) => {
     }),
   );
   app.use(helmet.dnsPrefetchControl());
-  app.use(helmet.expectCt());
+  app.use(helmet.hsts({
+    maxAge: 31536000, // 1 year in seconds
+    includeSubDomains: true, // Apply to subdomains as well
+    preload: true // Optionally add the preload directive for browsers
+  }));
   app.use(helmet.frameguard());
   app.use(helmet.hidePoweredBy());
   app.use(helmet.hsts());

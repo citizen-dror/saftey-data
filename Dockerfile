@@ -35,3 +35,7 @@ EXPOSE 5000
 
 # Start the application
 CMD ["node", "dist/server.js"]
+# buold:
+# docker build -t safety-data-node .    
+# run
+# docker run -e DB_USER -e DB_PASSWORD -e DB_NAME -p 5000:5000 safety-data-node

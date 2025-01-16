@@ -8,11 +8,11 @@ import accidentRoute from '../components/accidents/api/accidentAPI';
 import cityRoute from '../components/cities/cityAPI';
 import morganMiddleware from './morganLoader';
 import logger from '../middlewares/logger';
-const addRequestId = require('express-request-id')();
+// import * as expressRequestId from 'express-request-id';
 
 function expressLoader({ app }) {
-
-  app.use(addRequestId);
+  //const addRequestId = (await import('express-request-id')).default();
+  // app.use(expressRequestId);
   app.use(morganMiddleware);
 
   accidentRoute(app);

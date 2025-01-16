@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
       "module": "CommonJS",
+      "skipLibCheck": true,
       "lib": ["ESNext", "DOM"],
       "esModuleInterop": true,
       "target": "ES2022",
@@ -12,6 +13,7 @@
     },
     "include": [
       "src/**/*",
+      "src/types/**/*",   // Ensure the types folder is included
       "src/components/accidents/service/filterCols.json"
     ],
     "exclude": [
