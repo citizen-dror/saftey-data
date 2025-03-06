@@ -8,7 +8,7 @@ const corsOptions = {
         }
         if (
             /^http:\/\/localhost:\d+$/.test(origin) || // Allow localhost with any port
-            origin === 'https://safety-data.herokuapp.com' // Allow specific origin
+            origin === 'https://safety-data.herokuapp.com' || origin === 'https://safety-data.anyway.co.il' // Allow specific origin
           ) {
             callback(null, true);  // Accept the request
         } else {
