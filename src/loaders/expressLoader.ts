@@ -6,6 +6,7 @@ import path from 'path';
 import imageRoute from '../components/images/imagesAPI';
 import accidentRoute from '../components/accidents/api/accidentAPI';
 import cityRoute from '../components/cities/cityAPI';
+import recommendationRoute from '../components/recommendations/recommendationAPI';
 import morganMiddleware from './morganLoader';
 import logger from '../middlewares/logger';
 // import * as expressRequestId from 'express-request-id';
@@ -17,6 +18,7 @@ function expressLoader({ app }) {
 
   accidentRoute(app);
   cityRoute(app);
+  recommendationRoute(app);
   imageRoute(app);
 
   app.get("/api/v1/logger", (_, res) => {
