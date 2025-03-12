@@ -14,7 +14,8 @@
     "include": [
       "src/**/*",
       "src/types/**/*",   // Ensure the types folder is included
-      "src/components/accidents/service/filterCols.json"
+      "src/components/accidents/service/filterCols.json",
+      "src/test/**/*.ts" 
     ],
     "exclude": [
       "node_modules"

@@ -1,8 +1,10 @@
 import RecommendationDAL from './RecommendationDAL';
 import iRecommendTagsQuery from './iRecommendQuery';
 import iAccidentRecomandQuery from './iAccidentRecomandQuery';
+import { iRecommendation } from './iRecommendation';
 
 class RecommendationService {
+  private dal = new RecommendationDAL();
     // Method to get recommendations based on the iRecommendQuery input
     public getRecommendationsByTags = async (query: iRecommendTagsQuery) => {
       try {
@@ -23,7 +25,7 @@ class RecommendationService {
         const projection = { title: 1, category: 1, description: 1 };
   
         // Call DAL method to find recommendations based on the constructed filter
-        const recommendations = await RecommendationDAL.recommendation_find(filter, projection);
+        const recommendations = await this.dal.recommendation_find(filter, projection);
         return recommendations;
       } catch (error) {
         // Handle any potential errors
@@ -33,13 +35,25 @@ class RecommendationService {
     public getBestRecommendations = async (accidentQu: iAccidentRecomandQuery) =>{
       try {
         // Call DAL method to find recommendations based on the constructed filter
-        const recommendations = await RecommendationDAL.getBestRecommendations(accidentQu);
+        const recommendations = await this.dal.getBestRecommendations(accidentQu);
         return recommendations;
       } catch (error) {
         // Handle any potential errors
         throw new Error(`Error getBestRecommendations: ${error.message}`);
       }
     }
+
+    async addRecommendation(data: Omit<iRecommendation, '_id' | 'creationDate' | 'updateDate'>): Promise<iRecommendation> {
+      return this.dal.addRecommendation(data);
+    }
+  
+    async editRecommendation(id: string, data: Partial<Omit<iRecommendation, '_id' | 'updateDate'>>): Promise<iRecommendation | null> {
+      return this.dal.editRecommendation(id, data);
+    }
+
+    async deleteRecommendation(id: string): Promise<iRecommendation | null> {
+      return this.dal.deleteRecommendation(id);
+    }
   }
 
-export default new RecommendationService();
+export default RecommendationService;

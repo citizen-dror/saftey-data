@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import loader from './loaders/index';
 import logger from './middlewares/logger';
 import terminateLoader from './loaders/terminateLoader';
@@ -10,7 +11,8 @@ const port = process.env.PORT || 5000;
 
 async function startServer() {
   const app = express();
- 
+  // bodyParser
+  app.use(bodyParser.json());
   await loader({ expressApp: app });
 
   var srv = app.listen(port, () => {

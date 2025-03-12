@@ -1,11 +1,10 @@
-const { expect } = require('chai');
-const request = require('supertest');
-const app = require('../../../src/app.js');
+import request from 'supertest';
+import app from '../../../src/server';
 
 describe('homepage', () => {
-  it('welcome the user', (done) => {
-    request(app).get('/')
-      .expect(200)
-      .expect(/Hello fine user!/, done);
+  it('welcome the user', async () => {
+    const response = await request(app).get('/');
+    expect(response.status).toBe(200);
+    expect(response.text).toMatch(/Hello fine user!/);
   });
 });

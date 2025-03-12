@@ -2,14 +2,15 @@ import { Router, Request, Response } from 'express';
 import RecommendationService from './recommendationService'; // import the service
 import iRecommendTagsQuery from './iRecommendQuery'; // import the interface
 import iAccidentRecomandQuery from './iAccidentRecomandQuery'; 
-const route = Router();
+const router = Router();
 
   // Controller to recommendations
 const recommendationRoute = (app: Router) => {
-  app.use('/api/v1/recommendations', route);
+  app.use('/api/v1/recommendations', router);
+  const recommendationService = new RecommendationService();
 
   //get recommendations by lang and tags
-  route.get('/tags/', async (req: Request, res: Response) => {
+  router.get('/tags/', async (req: Request, res: Response) => {
     try {
       // Construct query object based on tags and lang
       const queryObject: iRecommendTagsQuery = {
@@ -21,7 +22,7 @@ const recommendationRoute = (app: Router) => {
       };
 
       // Call the service method to get recommendations
-      const recommendations = await RecommendationService.getRecommendationsByTags(queryObject);
+      const recommendations = await recommendationService.getRecommendationsByTags(queryObject);
 
       // Return the recommendations in the response
       return res.json(recommendations);
@@ -32,7 +33,7 @@ const recommendationRoute = (app: Router) => {
   });
 
    //get best recommendations by lang ans score
-  route.get('/', async (req: Request, res: Response) => {
+   router.get('/', async (req: Request, res: Response) => {
     try {
       // Construct query object based on request query parameters
       const queryObject: iAccidentRecomandQuery = {
@@ -41,7 +42,7 @@ const recommendationRoute = (app: Router) => {
         ...(req.query.rt ? { roadType: req.query.rt as string } : {})
       };
       // Call the service method to get recommendations
-      const recommendations = await RecommendationService.getBestRecommendations(queryObject);
+      const recommendations = await recommendationService.getBestRecommendations(queryObject);
       // Return the recommendations in the response
       return res.json(recommendations);
     } catch (error) {
@@ -49,6 +50,40 @@ const recommendationRoute = (app: Router) => {
       return res.status(500).json({ error: error.message });
     }
   });
+
+  router.post('/', async (req: Request, res: Response) => {
+    try {
+      const recommendation = await recommendationService.addRecommendation(req.body);
+      res.status(201).json(recommendation);
+    } catch (error) {
+      res.status(500).json({ message: 'Error adding recommendation', error });
+    }
+  });
+  
+  router.put('/:id', async (req: Request, res: Response) => {
+    try {
+      const updatedRecommendation = await recommendationService.editRecommendation(req.params.id, req.body);
+      if (!updatedRecommendation) {
+        return res.status(404).json({ message: 'Recommendation not found' });
+      }
+      res.json(updatedRecommendation);
+    } catch (error) {
+      res.status(500).json({ message: 'Error editing recommendation', error });
+    }
+  });
+
+  router.delete('/:id', async (req: Request, res: Response) => {
+    try {
+      const deletedRecommendation = await recommendationService.deleteRecommendation(req.params.id);
+      if (!deletedRecommendation) {
+        return res.status(404).json({ message: 'Recommendation not found' });
+      }
+      res.json({ message: 'Recommendation deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting recommendation', error });
+    }
+  });
+  
 };
 
 export default recommendationRoute;
