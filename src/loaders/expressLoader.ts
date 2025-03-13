@@ -3,9 +3,12 @@ import path from 'path';
 // import bodyParser from 'body-parser';
 
 // import * as cors from 'cors';
-import imageRoute from '../components/images/imagesAPI';
+
 import accidentRoute from '../components/accidents/api/accidentAPI';
 import cityRoute from '../components/cities/cityAPI';
+import authRouter from '../components/auth/authAPI';
+import userRouter from '../components/users/userApi';
+import imageRoute from '../components/images/imagesAPI';
 import recommendationRoute from '../components/recommendations/recommendationAPI';
 import morganMiddleware from './morganLoader';
 import logger from '../middlewares/logger';
@@ -15,7 +18,10 @@ function expressLoader({ app }) {
   //const addRequestId = (await import('express-request-id')).default();
   // app.use(expressRequestId);
   app.use(morganMiddleware);
-
+  
+  //add routers
+  authRouter(app);
+  userRouter(app);
   accidentRoute(app);
   cityRoute(app);
   recommendationRoute(app);

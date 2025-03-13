@@ -2,29 +2,29 @@ import expressLoader from './expressLoader';
 import rateLimitLoader from './rateLimitLoader';
 import helmetLoader from './helmetLoader';
 import corsLoder from './corsLoader';
+import authLoder from './authLoder';
 const {connect} = require('../database1');
 // import mongooseLoader from './mongoose';
 import logger from '../middlewares/logger';
 
 const loader = async ({ expressApp }) => {
-  await corsLoder({app: expressApp});
-  logger.info('cors Loader Initialized');
+  await corsLoder({ app: expressApp });
+  logger.info('CORS Loader Initialized');
 
   await helmetLoader({ app: expressApp });
-  logger.info('helmet Loader Initialized');
+  logger.info('Helmet Loader Initialized');
 
   await rateLimitLoader({ app: expressApp });
-  logger.info('rate limit Initialized');
-
-  // const mongoConnection = await mongooseLoader();
-  // eslint-disable-next-line no-unused-vars
-  await connect();
-  logger.info('MongoDB Initialized');
+  logger.info('Rate Limit Initialized');
 
   await expressLoader({ app: expressApp });
   logger.info('Express Initialized');
 
-  // ... more loaders can be here
+  //await authLoder({ app: expressApp }); // Moved here
+  //logger.info('Auth Loader Initialized');
+
+  await connect();
+  logger.info('MongoDB Initialized');
 };
 
 export default loader;
