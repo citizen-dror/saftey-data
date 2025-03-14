@@ -23,8 +23,7 @@ const userRouter = (app: Router): void => {
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
-    
-            res.json({ message: `Welcome ${user.username}, your role is ${user.role}` });
+            res.json({ username:`${user.username}`, role: `${user.role}` });
         } catch (err) {
             res.status(500).json({ error: 'Failed to fetch user data' });
         }
