@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import RecommendationService from './recommendationService'; // import the service
 import iRecommendTagsQuery from './iRecommendQuery'; // import the interface
 import iAccidentRecomandQuery from './iAccidentRecomandQuery'; 
+import auth from '../../middlewares/auth';
+import { UserRole } from '../users/roles';
 const router = Router();
 
   // Controller to recommendations
@@ -51,7 +53,8 @@ const recommendationRoute = (app: Router) => {
     }
   });
 
-  router.post('/', async (req: Request, res: Response) => {
+  // add recommendation
+  router.post('/', auth([UserRole.ADMIN, UserRole.EDITOR]), async (req: Request, res: Response) => {
     try {
       const recommendation = await recommendationService.addRecommendation(req.body);
       res.status(201).json(recommendation);
@@ -59,8 +62,8 @@ const recommendationRoute = (app: Router) => {
       res.status(500).json({ message: 'Error adding recommendation', error });
     }
   });
-  
-  router.put('/:id', async (req: Request, res: Response) => {
+  // edit recommendation
+  router.put('/:id',auth([UserRole.ADMIN, UserRole.EDITOR]),  async (req: Request, res: Response) => {
     try {
       const updatedRecommendation = await recommendationService.editRecommendation(req.params.id, req.body);
       if (!updatedRecommendation) {
@@ -71,8 +74,8 @@ const recommendationRoute = (app: Router) => {
       res.status(500).json({ message: 'Error editing recommendation', error });
     }
   });
-
-  router.delete('/:id', async (req: Request, res: Response) => {
+  // delete recommendation
+  router.delete('/:id',auth([UserRole.ADMIN, UserRole.EDITOR]), async (req: Request, res: Response) => {
     try {
       const deletedRecommendation = await recommendationService.deleteRecommendation(req.params.id);
       if (!deletedRecommendation) {
