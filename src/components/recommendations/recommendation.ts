@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const RecommendationSchema = new mongoose.Schema({
-  _id: String,
+  _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
   title: String,
   category: String,
   description: String,
