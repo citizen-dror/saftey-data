@@ -1,5 +1,7 @@
+import mongoose from 'mongoose';
+
 export interface iRecommendation {
-    _id: string;
+    _id: string | mongoose.Types.ObjectId;
     title: string;
     category: string;
     description: string;

@@ -35,12 +35,7 @@ class RecommendationDAL {
 
   async addRecommendation(data: Omit<iRecommendation, '_id' | 'creationDate' | 'updateDate'>): Promise<iRecommendation> {
     try {
-      const recommendation = new RecommendationModel({
-        _id: new mongoose.Types.ObjectId(),
-        ...data,
-        creationDate: new Date(),
-        updateDate: new Date(),
-      });
+      const recommendation = new RecommendationModel(data);
       return await recommendation.save();
     } catch (error) {
       console.error('Error adding recommendation:', error);
