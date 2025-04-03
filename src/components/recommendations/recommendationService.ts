@@ -1,3 +1,4 @@
+import RedisClient from '../../infrastructure/redisClient';
 import RecommendationDAL from './RecommendationDAL';
 import iRecommendTagsQuery from './iRecommendQuery';
 import iAccidentRecomandQuery from './iAccidentRecomandQuery';
@@ -5,55 +6,88 @@ import { iRecommendation } from './iRecommendation';
 
 class RecommendationService {
   private dal = new RecommendationDAL();
-    // Method to get recommendations based on the iRecommendQuery input
-    public getRecommendationsByTags = async (query: iRecommendTagsQuery) => {
-      try {
-        // Prepare filter from the query object
-        const filter: any = { lang: query.lang };
-  
-        if (query.tags) {
-          filter.tags = { $in: query.tags }; // Ensure tags are in the array
-        }
-  
-        // if (query.category) {
-        //   filter.category = query.category;
-        // } else {
-        //   filter.category = { $exists: true }; // Default to all categories if not provided
-        // }
-  
-        // Set default projection fields (title, category, description)
-        const projection = { title: 1, category: 1, description: 1 };
-  
-        // Call DAL method to find recommendations based on the constructed filter
-        const recommendations = await this.dal.recommendation_find(filter, projection);
-        return recommendations;
-      } catch (error) {
-        // Handle any potential errors
-        throw new Error(`Error getting recommendations: ${error.message}`);
-      }
-    }
-    public getBestRecommendations = async (accidentQu: iAccidentRecomandQuery) =>{
-      try {
-        // Call DAL method to find recommendations based on the constructed filter
-        const recommendations = await this.dal.getBestRecommendations(accidentQu);
-        return recommendations;
-      } catch (error) {
-        // Handle any potential errors
-        throw new Error(`Error getBestRecommendations: ${error.message}`);
-      }
-    }
+  private redisClient = RedisClient.getClient();
+  private redisEnabled = !!this.redisClient;
 
-    async addRecommendation(data: Omit<iRecommendation, '_id' | 'creationDate' | 'updateDate'>): Promise<iRecommendation> {
-      return this.dal.addRecommendation(data);
-    }
-  
-    async editRecommendation(id: string, data: Partial<Omit<iRecommendation, '_id' | 'updateDate'>>): Promise<iRecommendation | null> {
-      return this.dal.editRecommendation(id, data);
-    }
+  private async clearCache() {
+    if (!this.redisEnabled) return;
 
-    async deleteRecommendation(id: string): Promise<iRecommendation | null> {
-      return this.dal.deleteRecommendation(id);
+    try {
+      const keys = await this.redisClient?.keys('recommendations:*');
+      if (keys && keys.length > 0) {
+        await this.redisClient?.del(keys);
+      }
+    } catch (error) {
+      console.error('Error clearing specific cache:', error);
     }
   }
+
+  public getRecommendationsByTags = async (query: iRecommendTagsQuery) => {
+    try {
+      const cacheKey = `recommendations:${query.lang}:${query.tags?.join(',') || 'all'}`;
+
+      if (this.redisEnabled) {
+        const cachedData = await this.redisClient?.get(cacheKey);
+        if (cachedData) return JSON.parse(cachedData);
+      }
+
+      const filter: any = { lang: query.lang };
+      if (query.tags) {
+        filter.tags = { $in: query.tags };
+      }
+      const projection = { title: 1, category: 1, description: 1 };
+
+      const recommendations = await this.dal.recommendation_find(filter, projection);
+
+      if (this.redisEnabled) {
+        await this.redisClient?.set(cacheKey, JSON.stringify(recommendations), 'EX', 600);
+      }
+
+      return recommendations;
+    } catch (error) {
+      console.error(`Error getting recommendations: ${error.message}`);
+      return [];
+    }
+  };
+
+  public getBestRecommendations = async (accidentQu: iAccidentRecomandQuery) => {
+    try {
+      const cacheKey = `best_recommendations:${JSON.stringify(accidentQu)}`;
+      if (this.redisEnabled) {
+        const cachedData = await this.redisClient?.get(cacheKey);
+        if (cachedData) return JSON.parse(cachedData);
+      }
+
+      const recommendations = await this.dal.getBestRecommendations(accidentQu);
+
+      if (this.redisEnabled) {
+        await this.redisClient?.set(cacheKey, JSON.stringify(recommendations), 'EX', 600);
+      }
+
+      return recommendations;
+    } catch (error) {
+      console.error(`Error getBestRecommendations: ${error.message}`);
+      return [];
+    }
+  };
+
+  async addRecommendation(data: Omit<iRecommendation, '_id' | 'creationDate' | 'updateDate'>): Promise<iRecommendation> {
+    const recommendation = await this.dal.addRecommendation(data);
+    await this.clearCache();
+    return recommendation;
+  }
+
+  async editRecommendation(id: string, data: Partial<Omit<iRecommendation, '_id' | 'updateDate'>>): Promise<iRecommendation | null> {
+    const updatedRecommendation = await this.dal.editRecommendation(id, data);
+    await this.clearCache();
+    return updatedRecommendation;
+  }
+
+  async deleteRecommendation(id: string): Promise<iRecommendation | null> {
+    const deletedRecommendation = await this.dal.deleteRecommendation(id);
+    await this.clearCache();
+    return deletedRecommendation;
+  }
+}
 
 export default RecommendationService;
