@@ -11,7 +11,7 @@
     "watch-ts": "tsc -w",
     "start:old": "node src/app.js",
     "start:dev": "nodemon --inspect dist/server.js",
-    "debug:dev": "nodemon --inspect-brk dist/server.js",
+    "dev": "nodemon --inspect-brk dist/server.js",
     "test": "jest"
   },
   "author": "dror",

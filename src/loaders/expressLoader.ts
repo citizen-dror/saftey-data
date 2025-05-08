@@ -10,6 +10,7 @@ import authRouter from '../components/auth/authAPI';
 import userRouter from '../components/users/userApi';
 import imageRoute from '../components/images/imagesAPI';
 import recommendationRoute from '../components/recommendations/recommendationAPI';
+import AuthService from '../components/auth/AuthService';
 import morganMiddleware from './morganLoader';
 import logger from '../middlewares/logger';
 // import * as expressRequestId from 'express-request-id';
@@ -19,8 +20,10 @@ function expressLoader({ app }) {
   // app.use(expressRequestId);
   app.use(morganMiddleware);
   
+  //services 
+  const authService = new AuthService();
   //add routers
-  authRouter(app);
+  authRouter(app, authService);
   userRouter(app);
   accidentRoute(app);
   cityRoute(app);
