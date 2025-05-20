@@ -4,12 +4,14 @@ import iRecommendTagsQuery from './iRecommendQuery'; // import the interface
 import iAccidentRecomandQuery from './iAccidentRecomandQuery'; 
 import auth from '../../middlewares/auth';
 import { UserRole } from '../users/roles';
+import RecommendationDAL from './RecommendationDAL';
+import RedisClient from '../../infrastructure/redisClient';
 const router = Router();
 
   // Controller to recommendations
 const recommendationRoute = (app: Router) => {
   app.use('/api/v1/recommendations', router);
-  const recommendationService = new RecommendationService();
+  const recommendationService = new RecommendationService(new RecommendationDAL());
 
   //get recommendations by lang and tags
   router.get('/tags/', async (req: Request, res: Response) => {

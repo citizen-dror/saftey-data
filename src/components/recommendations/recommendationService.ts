@@ -5,9 +5,14 @@ import iAccidentRecomandQuery from './iAccidentRecomandQuery';
 import { iRecommendation } from './iRecommendation';
 
 class RecommendationService {
-  private dal = new RecommendationDAL();
+  //private dal = new RecommendationDAL();
   private redisClient = RedisClient.getClient();
   private redisEnabled = !!this.redisClient;
+  constructor(
+    private dal: RecommendationDAL,
+  ) {
+    
+  }
 
   private async clearCache() {
     if (!this.redisEnabled) return;

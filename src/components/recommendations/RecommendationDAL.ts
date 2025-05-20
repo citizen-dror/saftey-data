@@ -5,11 +5,11 @@ import { iRecommendation } from './iRecommendation';
 
 class RecommendationDAL {
 
-  public recommendation_aggregate = (pipeline: any[]) => {
-    return RecommendationModel.aggregate(pipeline);
-  };
+  public async recommendation_aggregate(pipeline: any[]): Promise<any[]> {
+    return await RecommendationModel.aggregate(pipeline);
+  }
 
-  public recommendation_find = (filter: any, proj: any) => {
+  public recommendation_find = async (filter: any, proj: any) => {
         return RecommendationModel.find(filter); // Fetch all documents
   }
   public getBestRecommendations = async (accidentQu: iAccidentRecomandQuery) => {
