@@ -4,6 +4,11 @@ import iAccidentRecomandQuery from './iAccidentRecomandQuery';
 import { iRecommendation } from './iRecommendation';
 
 class RecommendationDAL {
+
+  public recommendation_aggregate = (pipeline: any[]) => {
+    return RecommendationModel.aggregate(pipeline);
+  };
+
   public recommendation_find = (filter: any, proj: any) => {
         return RecommendationModel.find(filter); // Fetch all documents
   }

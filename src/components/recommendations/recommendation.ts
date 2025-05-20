@@ -5,7 +5,12 @@ const RecommendationSchema = new mongoose.Schema({
   title: String,
   category: String,
   description: String,
-  tags: [String],
+  tags: [
+    {
+    name: String,
+    score: Number
+    }
+  ],
   language: String,
   lang: String,
   references: [
@@ -18,4 +23,4 @@ const RecommendationSchema = new mongoose.Schema({
   updateDate: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Recommendation', RecommendationSchema, 'Recommendations');
+module.exports = mongoose.model('Recommendation', RecommendationSchema, 'Recommendations2');

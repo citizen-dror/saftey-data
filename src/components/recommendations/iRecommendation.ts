@@ -5,12 +5,17 @@ export interface iRecommendation {
     title: string;
     category: string;
     description: string;
-    tags: string[];
+    tags: TagScore[];
     language?: string;
     lang: string;
     references: Reference[];
     creationDate: Date;
     updateDate: Date;
+  }
+
+ export interface TagScore {
+    name: string;
+    score: number;
   }
 
   export interface Reference {

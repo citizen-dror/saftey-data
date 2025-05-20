@@ -22,33 +22,58 @@ class RecommendationService {
     }
   }
 
-  public getRecommendationsByTags = async (query: iRecommendTagsQuery) => {
-    try {
-      const cacheKey = `recommendations:${query.lang}:${query.tags?.join(',') || 'all'}`;
+public getRecommendationsByTags = async (query: iRecommendTagsQuery) => {
+  try {
+    const cacheKey = `recommendations:${query.lang}:${query.tags?.join(',') || 'all'}`;
 
-      if (this.redisEnabled) {
-        const cachedData = await this.redisClient?.get(cacheKey);
-        if (cachedData) return JSON.parse(cachedData);
-      }
-
-      const filter: any = { lang: query.lang };
-      if (query.tags) {
-        filter.tags = { $in: query.tags };
-      }
-      const projection = { title: 1, category: 1, description: 1 };
-
-      const recommendations = await this.dal.recommendation_find(filter, projection);
-
-      if (this.redisEnabled) {
-        await this.redisClient?.set(cacheKey, JSON.stringify(recommendations), 'EX', 600);
-      }
-
-      return recommendations;
-    } catch (error) {
-      console.error(`Error getting recommendations: ${error.message}`);
-      return [];
+    if (this.redisEnabled) {
+      const cachedData = await this.redisClient?.get(cacheKey);
+      if (cachedData) return JSON.parse(cachedData);
     }
-  };
+
+    const pipeline: any[] = [
+      { $match: { lang: query.lang } }
+    ];
+
+    if (query.tags?.length) {
+      pipeline.push(
+        { $match: { "tags.name": { $in: query.tags } } },
+        {
+          $addFields: {
+            maxMatchingScore: {
+              $max: {
+                $map: {
+                  input: {
+                    $filter: {
+                      input: "$tags",
+                      as: "tag",
+                      cond: { $in: ["$$tag.name", query.tags] }
+                    }
+                  },
+                  as: "match",
+                  in: "$$match.score"
+                }
+              }
+            }
+          }
+        },
+        { $sort: { maxMatchingScore: -1 } }
+      );
+    }
+
+    const recommendations = await this.dal.recommendation_aggregate(pipeline);
+
+    if (this.redisEnabled) {
+      await this.redisClient?.set(cacheKey, JSON.stringify(recommendations), 'EX', 600);
+    }
+
+    return recommendations;
+  } catch (error) {
+    console.error(`Error getting recommendations: ${error.message}`);
+    return [];
+  }
+};
+
 
   public getBestRecommendations = async (accidentQu: iAccidentRecomandQuery) => {
     try {
